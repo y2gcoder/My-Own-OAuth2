@@ -1,4 +1,4 @@
-package com.y2gcoder.auth.member.domain;
+package com.y2gcoder.auth.user.domain;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

@@ -1,7 +1,7 @@
-package com.y2gcoder.auth.member.application;
+package com.y2gcoder.auth.user.application;
 
-import com.y2gcoder.auth.member.domain.User;
-import com.y2gcoder.auth.member.domain.UserId;
+import com.y2gcoder.auth.user.domain.User;
+import com.y2gcoder.auth.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,8 +1,8 @@
-package com.y2gcoder.auth.member.infra;
+package com.y2gcoder.auth.user.infra;
 
-import com.y2gcoder.auth.member.application.UserRepository;
-import com.y2gcoder.auth.member.domain.User;
-import com.y2gcoder.auth.member.domain.UserId;
+import com.y2gcoder.auth.user.application.UserRepository;
+import com.y2gcoder.auth.user.domain.User;
+import com.y2gcoder.auth.user.domain.UserId;
 
 import java.util.*;
 

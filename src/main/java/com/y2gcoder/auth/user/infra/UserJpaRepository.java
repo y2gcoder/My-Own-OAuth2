@@ -1,4 +1,4 @@
-package com.y2gcoder.auth.member.infra;
+package com.y2gcoder.auth.user.infra;
 
 import org.springframework.data.repository.Repository;
 

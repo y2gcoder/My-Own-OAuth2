@@ -1,7 +1,7 @@
-package com.y2gcoder.auth.member.infra;
+package com.y2gcoder.auth.user.infra;
 
 import com.y2gcoder.auth.common.infra.BaseTimeEntity;
-import com.y2gcoder.auth.member.domain.User;
+import com.y2gcoder.auth.user.domain.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

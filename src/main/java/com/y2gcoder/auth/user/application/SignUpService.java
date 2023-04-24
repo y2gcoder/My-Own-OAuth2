@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CreateUserService {
+public class SignUpService {
     private final UserRepository userRepository;
 
-    public void create(String email, String password, String name) {
+    public void signUp(String email, String password, String name) {
         checkIfUserExistsByEmail(email);
 
         UserId userId = userRepository.nextUserId();

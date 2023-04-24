@@ -12,15 +12,15 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class CreateUserServiceTest {
+class SignUpServiceTest {
 
     private UserRepository userRepository;
-    private CreateUserService sut;
+    private SignUpService sut;
 
     @BeforeEach
     void init() {
         userRepository = new FakeUserRepository();
-        sut = new CreateUserService(userRepository);
+        sut = new SignUpService(userRepository);
     }
 
 
@@ -33,7 +33,7 @@ class CreateUserServiceTest {
         String name = "테스터";
 
         //when
-        sut.create(email, password, name);
+        sut.signUp(email, password, name);
 
         //then
         Map<UserId, User> store = ((FakeUserRepository) userRepository).getStore();
@@ -55,7 +55,7 @@ class CreateUserServiceTest {
         //expected
         String newPassword = "newpassword";
         String newName = "새로운 테스터";
-        assertThatThrownBy(() -> sut.create(email, newPassword, name))
+        assertThatThrownBy(() -> sut.signUp(email, newPassword, name))
                 .isInstanceOf(UserWithEmailExistsException.class);
     }
 

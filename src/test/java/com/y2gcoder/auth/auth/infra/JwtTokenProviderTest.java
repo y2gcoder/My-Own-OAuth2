@@ -1,6 +1,7 @@
 package com.y2gcoder.auth.auth.infra;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Encoders;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -117,17 +119,20 @@ class JwtTokenProviderTest {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = 5 * 1000L;
+        expiration = 60 * 1000L;
         sut = new JwtTokenProvider(secretString, expiration);
         String username = String.valueOf(1L);
         String token = sut.generateToken(username);
-        LocalDateTime expectedExpirationDate = LocalDateTime.now().plusSeconds(5);
 
         //when
         LocalDateTime result = sut.getExpiration(token);
 
         //then
-        assertThat(result).isEqualToIgnoringNanos(expectedExpirationDate);
+        LocalDateTime issuedDateTime = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
+                .getBody().getIssuedAt().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        assertThat(result).isEqualToIgnoringNanos(issuedDateTime.plusSeconds(60));
     }
 
 }

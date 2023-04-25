@@ -35,11 +35,12 @@ public class SignInService {
         //소유자 id를 사용해서 refresh token을 만든다.
         RefreshTokenId refreshTokenId = refreshTokenRepository.nextRefreshTokenId();
         Duration refreshTokenExpiration = refreshTokenProvider.getExpiration();
-        LocalDateTime refreshTokenExpirationTime = LocalDateTime.now().plus(refreshTokenExpiration);
+        LocalDateTime issuedAt = LocalDateTime.now();
+        LocalDateTime refreshTokenExpirationTime = issuedAt.plus(refreshTokenExpiration);
         RefreshToken refreshToken = new RefreshToken(refreshTokenId,
                 refreshTokenProvider.generateToken(),
                 ownerId,
-                refreshTokenExpirationTime);
+                refreshTokenExpirationTime, issuedAt);
         refreshTokenRepository.save(refreshToken);
 
         //Authorization Code를 사용 상태로 변경한다.

@@ -38,7 +38,6 @@ class SignInServiceTest {
         jwtTokenProvider = new JwtTokenProvider(secretString, expiration);
         refreshTokenRepository = new FakeRefreshTokenRepository();
         refreshTokenProvider = new StubRefreshTokenProvider();
-
         sut = new SignInService(
                 authorizationCodeRepository,
                 jwtTokenProvider,

@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.UUID;
 
 @Slf4j
 public class JwtTokenProvider {
@@ -28,6 +29,7 @@ public class JwtTokenProvider {
     public String generateToken(String username) {
         return Jwts.builder()
                 .signWith(key)
+                .setId(UUID.randomUUID().toString())
                 .setHeaderParam("typ", "JWT")
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -58,8 +60,25 @@ public class JwtTokenProvider {
     }
 
     public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
-                .getBody().getSubject();
+        try {
+            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
+                    .getBody().getSubject();
+        } catch (ExpiredJwtException e) {
+            log.info("Jwt Token is Expired");
+            return e.getClaims().getSubject();
+        } catch (UnsupportedJwtException e) {
+            log.warn("Jwt Token is invalid");
+            throw e;
+        } catch (MalformedJwtException e) {
+            log.warn("Jwt Token is invalid");
+            throw e;
+        } catch (SignatureException e) {
+            log.warn("Jwt signature validation fails");
+            throw e;
+        } catch (IllegalArgumentException e) {
+            log.warn("Jwt Token is invalid");
+            throw e;
+        }
     }
 
     public LocalDateTime getExpiration(String token) {

@@ -10,4 +10,6 @@ public interface RefreshTokenJpaRepository extends Repository<RefreshTokenJpaEnt
     Optional<RefreshTokenJpaEntity> findById(String id);
 
     Optional<RefreshTokenJpaEntity> findByToken(String token);
+
+    Optional<RefreshTokenJpaEntity> findFirstByOwnerIdOrderByIssuedAtDesc(String ownerId);
 }

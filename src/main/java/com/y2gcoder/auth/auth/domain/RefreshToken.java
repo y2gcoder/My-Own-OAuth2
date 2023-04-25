@@ -9,14 +9,19 @@ public class RefreshToken {
     private RefreshTokenId id;
     private String token;
     private UserId ownerId;
-
     private LocalDateTime expirationTime;
+    private LocalDateTime issuedAt;
 
-    public RefreshToken(RefreshTokenId id, String token, UserId ownerId, LocalDateTime expirationTime) {
+    public RefreshToken(RefreshTokenId id,
+                        String token,
+                        UserId ownerId,
+                        LocalDateTime expirationTime,
+                        LocalDateTime issuedAt) {
         this.id = id;
         this.token = token;
         this.ownerId = ownerId;
         this.expirationTime = expirationTime;
+        this.issuedAt = issuedAt;
     }
 
     public RefreshTokenId getId() {
@@ -33,6 +38,10 @@ public class RefreshToken {
 
     public LocalDateTime getExpirationTime() {
         return expirationTime;
+    }
+
+    public LocalDateTime getIssuedAt() {
+        return issuedAt;
     }
 
     public boolean isExpired() {

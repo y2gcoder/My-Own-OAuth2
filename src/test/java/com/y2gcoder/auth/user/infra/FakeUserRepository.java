@@ -29,6 +29,16 @@ public class FakeUserRepository implements UserRepository {
         return false;
     }
 
+    @Override
+    public Optional<User> findByEmail(String email) {
+        for (User user : fakeUsers.values()) {
+            if (user.getEmail().equals(email)) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
+    }
+
     public Map<UserId, User> getStore() {
         return Collections.unmodifiableMap(fakeUsers);
     }

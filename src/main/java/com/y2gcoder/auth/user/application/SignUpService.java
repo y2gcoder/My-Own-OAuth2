@@ -14,7 +14,7 @@ public class SignUpService {
         checkIfUserExistsByEmail(email);
 
         UserId userId = userRepository.nextUserId();
-        User user = new User(userId, email, password, name);
+        User user = new User(userId, email, password, name, null);
         userRepository.save(user);
     }
 

@@ -49,7 +49,7 @@ class SignUpServiceTest {
         String password = "password";
         String name = "테스터";
         UserId userId = userRepository.nextUserId();
-        User user = new User(userId, email, password, name);
+        User user = new User(userId, email, password, name, null);
         userRepository.save(user);
 
         //expected

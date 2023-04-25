@@ -4,7 +4,7 @@ import org.springframework.data.repository.Repository;
 
 import java.util.Optional;
 
-public interface UserJpaRepository extends Repository<UserJpaEntity, Long> {
+public interface UserJpaRepository extends Repository<UserJpaEntity, String> {
     void save(UserJpaEntity entity);
 
     boolean existsByEmail(String email);

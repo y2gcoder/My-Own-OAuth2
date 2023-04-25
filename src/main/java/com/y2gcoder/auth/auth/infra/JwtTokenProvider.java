@@ -10,6 +10,7 @@ import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.security.Key;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -17,9 +18,9 @@ import java.util.Date;
 @Slf4j
 public class JwtTokenProvider {
     private final Key key;
-    private final Long expiration;
+    private final Duration expiration;
 
-    public JwtTokenProvider(String secretString, Long expiration) {
+    public JwtTokenProvider(String secretString, Duration expiration) {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretString));
         this.expiration = expiration;
     }
@@ -30,7 +31,7 @@ public class JwtTokenProvider {
                 .setHeaderParam("typ", "JWT")
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration.toMillis()))
                 .compact();
     }
 

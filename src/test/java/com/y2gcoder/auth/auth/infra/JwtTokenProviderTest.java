@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.SecretKey;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -21,7 +22,7 @@ class JwtTokenProviderTest {
 
 
     private String secretString;
-    private Long expiration;
+    private Duration expiration;
     private JwtTokenProvider sut;
 
 
@@ -31,7 +32,7 @@ class JwtTokenProviderTest {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = 5 * 1000L;
+        expiration = Duration.ofMillis(5 * 1000L);
         sut = new JwtTokenProvider(secretString, expiration);
 
         //when
@@ -49,7 +50,7 @@ class JwtTokenProviderTest {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = 1L;
+        expiration = Duration.ofMillis(1L);
         sut = new JwtTokenProvider(secretString, expiration);
         String username = String.valueOf(1L);
         String result = sut.generateToken(username);
@@ -65,7 +66,7 @@ class JwtTokenProviderTest {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = 5 * 1000L;
+        expiration = Duration.ofMillis(5 * 1000L);
         sut = new JwtTokenProvider(secretString, expiration);
 
         //expected
@@ -80,7 +81,7 @@ class JwtTokenProviderTest {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = 5 * 1000L;
+        expiration = Duration.ofMillis(5 * 1000L);
         sut = new JwtTokenProvider(secretString, expiration);
 
         String username = String.valueOf(1L);
@@ -101,7 +102,7 @@ class JwtTokenProviderTest {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = 5 * 1000L;
+        expiration = Duration.ofMillis(5 * 1000L);
         sut = new JwtTokenProvider(secretString, expiration);
         String username = String.valueOf(1L);
         String token = sut.generateToken(username);
@@ -119,7 +120,7 @@ class JwtTokenProviderTest {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = 60 * 1000L;
+        expiration = Duration.ofSeconds(60L);
         sut = new JwtTokenProvider(secretString, expiration);
         String username = String.valueOf(1L);
         String token = sut.generateToken(username);

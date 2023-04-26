@@ -1,7 +1,9 @@
 package com.y2gcoder.auth.auth.application;
 
 import com.y2gcoder.auth.auth.domain.AuthorizationCode;
+import com.y2gcoder.auth.auth.domain.AuthorizationCodeProvider;
 import com.y2gcoder.auth.auth.domain.OwnerService;
+import com.y2gcoder.auth.auth.infra.BasicAuthorizationCodeProvider;
 import com.y2gcoder.auth.auth.infra.FakeAuthorizationCodeRepository;
 import com.y2gcoder.auth.auth.infra.StubOwnerService;
 import com.y2gcoder.auth.common.application.Time;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,8 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class IssueAuthorizationCodeServiceTest {
     private OwnerService ownerService;
     private AuthorizationCodeRepository authorizationCodeRepository;
-    private Time time;
-    private Long expirationMinutes;
+    private AuthorizationCodeProvider authorizationCodeProvider;
 
     private IssueAuthorizationCodeService sut;
 
@@ -26,13 +28,13 @@ class IssueAuthorizationCodeServiceTest {
     void setUp() {
         ownerService = new StubOwnerService();
         authorizationCodeRepository = new FakeAuthorizationCodeRepository();
-        time = new StubTime(LocalDateTime.of(2023, 4, 24, 17, 48));
-        expirationMinutes = 5L;
+        Time time = new StubTime(LocalDateTime.of(2023, 4, 24, 17, 48));
+        Duration expiration = Duration.ofMinutes(5);
+        authorizationCodeProvider = new BasicAuthorizationCodeProvider(time, expiration);
         sut = new IssueAuthorizationCodeService(
                 ownerService,
                 authorizationCodeRepository,
-                time,
-                expirationMinutes
+                authorizationCodeProvider
         );
     }
 
@@ -43,12 +45,12 @@ class IssueAuthorizationCodeServiceTest {
         String email = "test@test.com";
         String password = "password";
 
-        time = new StubTime(LocalDateTime.now());
+        Time time = new StubTime(LocalDateTime.now());
+        Duration expiration = Duration.ofMinutes(5);
         sut = new IssueAuthorizationCodeService(
                 ownerService,
                 authorizationCodeRepository,
-                time,
-                expirationMinutes
+                new BasicAuthorizationCodeProvider(time, expiration)
         );
 
         //when
@@ -82,12 +84,12 @@ class IssueAuthorizationCodeServiceTest {
         String email = "test@test.com";
         String password = "password";
 
-        time = new StubTime(LocalDateTime.now());
+        Time time = new StubTime(LocalDateTime.now());
+        Duration expiration = Duration.ofMinutes(5);
         sut = new IssueAuthorizationCodeService(
                 ownerService,
                 authorizationCodeRepository,
-                time,
-                expirationMinutes
+                new BasicAuthorizationCodeProvider(time, expiration)
         );
 
         //when

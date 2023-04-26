@@ -17,7 +17,7 @@ class AuthorizationCodeTest {
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(5);
         AuthorizationCode authorizationCode = new AuthorizationCode(
                 AuthorizationCodeId.of("authcodeid"),
-                CodeGenerator.generateCode(),
+                "authorizationcode",
                 expirationTime,
                 AuthorizationCodeStatus.ISSUED,
                 UserId.of("userid")
@@ -34,7 +34,7 @@ class AuthorizationCodeTest {
         LocalDateTime expirationTime = LocalDateTime.now();
         AuthorizationCode authorizationCode = new AuthorizationCode(
                 AuthorizationCodeId.of("authcodeid"),
-                CodeGenerator.generateCode(),
+                "authorizationcode",
                 expirationTime,
                 AuthorizationCodeStatus.ISSUED,
                 UserId.of("userid")
@@ -51,7 +51,7 @@ class AuthorizationCodeTest {
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(5);
         AuthorizationCode authorizationCode = new AuthorizationCode(
                 AuthorizationCodeId.of("authcodeid"),
-                CodeGenerator.generateCode(),
+                "authorizationcode",
                 expirationTime,
                 AuthorizationCodeStatus.ISSUED,
                 UserId.of("userid")

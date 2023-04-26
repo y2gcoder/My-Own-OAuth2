@@ -1,34 +1,26 @@
 package com.y2gcoder.auth.auth.application;
 
 import com.y2gcoder.auth.auth.domain.*;
-import com.y2gcoder.auth.common.application.Time;
 import com.y2gcoder.auth.user.domain.UserId;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+@Service
+@RequiredArgsConstructor
 public class IssueAuthorizationCodeService {
     private final OwnerService ownerService;
     private final AuthorizationCodeRepository authorizationCodeRepository;
-    private final Time time;
-    private final Long expirationMinutes;
-
-    public IssueAuthorizationCodeService(OwnerService ownerService,
-                                         AuthorizationCodeRepository authorizationCodeRepository,
-                                         Time time,
-                                         Long expirationMinutes) {
-        this.ownerService = ownerService;
-        this.authorizationCodeRepository = authorizationCodeRepository;
-        this.time = time;
-        this.expirationMinutes = expirationMinutes != null ? expirationMinutes : 5L;
-    }
+    private final AuthorizationCodeProvider authorizationCodeProvider;
 
     public AuthorizationCode issueAuthorizationCode(String email, String password) {
         // 1. email과 평문 password로 userId 찾기
         UserId ownerId = ownerService.getOwnerId(email, password);
         // 2. AuthorizationCode 생성
         AuthorizationCodeId authorizationCodeId = authorizationCodeRepository.nextAuthorizationCodeId();
-        String code = CodeGenerator.generateCode();
-        LocalDateTime expirationTime = time.now().plusMinutes(expirationMinutes);
+        String code = authorizationCodeProvider.generateCode();
+        LocalDateTime expirationTime = authorizationCodeProvider.getExpirationTime();
         AuthorizationCode authorizationCode = new AuthorizationCode(
                 authorizationCodeId,
                 code,

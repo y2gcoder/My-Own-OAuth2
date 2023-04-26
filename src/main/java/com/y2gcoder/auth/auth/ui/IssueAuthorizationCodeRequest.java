@@ -1,5 +1,6 @@
 package com.y2gcoder.auth.auth.ui;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignInRequest {
+public class IssueAuthorizationCodeRequest {
     @NotBlank
-    private String code;
+    @Email
+    private String email;
+    @NotBlank
+    private String password;
 }

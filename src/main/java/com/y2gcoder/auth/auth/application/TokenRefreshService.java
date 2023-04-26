@@ -17,7 +17,7 @@ public class TokenRefreshService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public TokenRefreshResponse tokenRefresh(String expiredAccessToken, String inputRefreshToken) {
+    public TokenRefreshDto tokenRefresh(String expiredAccessToken, String inputRefreshToken) {
         // 만료된 access token 에서 username 조회
         String username = jwtTokenProvider.getUsernameFromToken(expiredAccessToken);
         UserId ownerId = UserId.of(username);
@@ -39,7 +39,7 @@ public class TokenRefreshService {
         AccessTokenDto accessTokenDto = new AccessTokenDto(accessToken, accessTokenExpirationTime);
         RefreshTokenDto refreshTokenDto = new RefreshTokenDto(refreshToken.getToken(), refreshToken.getExpirationTime());
 
-        return new TokenRefreshResponse(accessTokenDto, refreshTokenDto);
+        return new TokenRefreshDto(accessTokenDto, refreshTokenDto);
     }
 
     private void validateInputRefreshToken(String inputRefreshToken, RefreshToken refreshToken) {

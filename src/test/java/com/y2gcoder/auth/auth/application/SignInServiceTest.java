@@ -60,7 +60,7 @@ class SignInServiceTest {
 
         //when
         String code = authorizationCode.getCode();
-        SignInResponse result = sut.signIn(code);
+        SignInDto result = sut.signIn(code);
 
         //then
         jwtTokenProvider.validateToken(result.getAccess().getToken());

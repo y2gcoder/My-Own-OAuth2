@@ -19,7 +19,7 @@ public class SignInService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final RefreshTokenProvider refreshTokenProvider;
 
-    public SignInResponse signIn(String code) {
+    public SignInDto signIn(String code) {
         //인증 코드로 소유자 id를 가져온다.(유효한 인증 코드인지 확인 필요)
         AuthorizationCode authorizationCode = authorizationCodeRepository.findByCode(code)
                 .orElseThrow(NotFoundAuthorizationCodeException::new);
@@ -49,6 +49,6 @@ public class SignInService {
         //반환한다.
         AccessTokenDto accessTokenDto = new AccessTokenDto(accessToken, accessTokenExpirationTime);
         RefreshTokenDto refreshTokenDto = new RefreshTokenDto(refreshToken.getToken(), refreshTokenExpirationTime);
-        return new SignInResponse(accessTokenDto, refreshTokenDto);
+        return new SignInDto(accessTokenDto, refreshTokenDto);
     }
 }

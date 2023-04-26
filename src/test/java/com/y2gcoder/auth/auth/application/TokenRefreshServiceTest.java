@@ -62,7 +62,7 @@ class TokenRefreshServiceTest {
         refreshTokenRepository.save(refreshToken);
 
         //when
-        TokenRefreshResponse result = sut.tokenRefresh(accessToken, refreshToken.getToken());
+        TokenRefreshDto result = sut.tokenRefresh(accessToken, refreshToken.getToken());
 
         //then
         Assertions.assertThat(result.getAccess().getToken()).isNotEqualTo(accessToken);
@@ -91,7 +91,7 @@ class TokenRefreshServiceTest {
         refreshTokenRepository.save(refreshToken);
 
         //when
-        TokenRefreshResponse result = sut.tokenRefresh(accessToken, refreshToken.getToken());
+        TokenRefreshDto result = sut.tokenRefresh(accessToken, refreshToken.getToken());
 
         //then
         Assertions.assertThat(result.getAccess().getToken()).isNotEqualTo(accessToken);

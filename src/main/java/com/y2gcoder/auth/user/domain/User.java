@@ -31,11 +31,12 @@ public class User {
         return deletedAt;
     }
 
-    public User(UserId id, String email, String password, String name) {
+    public User(UserId id, String email, String password, String name, LocalDateTime deletedAt) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.name = name;
+        this.deletedAt = deletedAt;
     }
 
     public void delete() {

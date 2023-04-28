@@ -2,6 +2,7 @@ package com.y2gcoder.auth.user.infra;
 
 import com.y2gcoder.auth.common.infra.BaseTimeEntity;
 import com.y2gcoder.auth.user.domain.User;
+import com.y2gcoder.auth.user.domain.UserId;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -35,6 +36,16 @@ public class UserJpaEntity extends BaseTimeEntity {
                 user.getPassword(),
                 user.getName(),
                 user.getDeletedAt()
+        );
+    }
+
+    public User toDomain() {
+        return new User(
+                UserId.of(id),
+                email,
+                password,
+                name,
+                deletedAt
         );
     }
 }

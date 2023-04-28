@@ -6,6 +6,7 @@ import com.y2gcoder.auth.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -27,5 +28,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean existsByEmail(String email) {
         return userJpaRepository.existsByEmail(email);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        Optional<UserJpaEntity> optionalUserJpaEntity = userJpaRepository.findByEmail(email);
+        return optionalUserJpaEntity.map(UserJpaEntity::toDomain);
     }
 }

@@ -2,8 +2,12 @@ package com.y2gcoder.auth.user.infra;
 
 import org.springframework.data.repository.Repository;
 
-public interface UserJpaRepository extends Repository<UserJpaEntity, Long> {
+import java.util.Optional;
+
+public interface UserJpaRepository extends Repository<UserJpaEntity, String> {
     void save(UserJpaEntity entity);
 
     boolean existsByEmail(String email);
+
+    Optional<UserJpaEntity> findByEmail(String email);
 }

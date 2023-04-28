@@ -1,1 +1,10 @@
+token:
+  access:
+    secret: g83EgWbJix9kie3SWNrYj/OwVFnK/KVqE8DXSGKYq3o=
+    expiration: PT15M
+  refresh:
+    expiration: P30D
 
+basic:
+  authorization-code:
+    expiration: PT5M

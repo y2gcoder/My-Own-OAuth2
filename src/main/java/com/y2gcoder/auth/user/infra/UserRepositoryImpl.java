@@ -12,12 +12,13 @@ import java.util.UUID;
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
+
     private final UserJpaRepository userJpaRepository;
 
     @Override
-    public void save(User user) {
+    public User save(User user) {
         UserJpaEntity userJpaEntity = UserJpaEntity.fromDomain(user);
-        userJpaRepository.save(userJpaEntity);
+        return userJpaRepository.save(userJpaEntity).toDomain();
     }
 
     @Override

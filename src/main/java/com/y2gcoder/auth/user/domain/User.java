@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class User {
+
     private UserId id;
     private String email;
     private String password;
@@ -39,8 +40,11 @@ public class User {
         this.deletedAt = deletedAt;
     }
 
-    public void delete() {
-        this.deletedAt = LocalDateTime.now();
+    public void delete(LocalDateTime deletedAt) {
+        if (isDeleted()) {
+            throw new RuntimeException("이미 삭제된 회원입니다.");
+        }
+        this.deletedAt = deletedAt;
     }
 
     public boolean isDeleted() {
@@ -49,8 +53,12 @@ public class User {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         User user = (User) o;
         return Objects.equals(id, user.id);
     }

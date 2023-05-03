@@ -2,22 +2,26 @@ package com.y2gcoder.auth.user.ui;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
+@Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class SignUpRequest {
-    @NotBlank
-    @Email
+
+    @NotBlank(message = "이메일은 필수값입니다.")
+    @Email(message = "올바르지 않은 이메일 형식입니다.")
     private String email;
-    @Size(min = 8)
-    @NotBlank
+    @NotBlank(message = "비밀번호는 필수값입니다.")
     private String password;
-    @Size(min = 2)
-    @NotBlank
+    @NotBlank(message = "이름은 필수값입니다.")
     private String name;
+
+    @Builder
+    private SignUpRequest(String email, String password, String name) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+    }
 }

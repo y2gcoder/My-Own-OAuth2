@@ -1,5 +1,8 @@
 package com.y2gcoder.auth.auth.infra;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -7,16 +10,12 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import javax.crypto.SecretKey;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.crypto.SecretKey;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class JwtTokenProviderTest {
 
@@ -25,59 +24,59 @@ class JwtTokenProviderTest {
     private Duration expiration;
     private JwtTokenProvider sut;
 
-
-    @Test
     @DisplayName("JWT 토큰을 만들 수 있다.")
-    void whenGenerateToken_thenJwtTokenIsReturned() {
+    @Test
+    void generateToken() {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = Duration.ofMillis(5 * 1000L);
+        expiration = Duration.ofSeconds(5);
         sut = new JwtTokenProvider(secretString, expiration);
 
-        //when
         String username = String.valueOf(1L);
-        String result = sut.generateToken(username);
 
+        //when
+        String result = sut.generateToken(username);
 
         //then
         sut.validateToken(result);
     }
 
-    @Test
     @DisplayName("유효기간이 지난 토큰을 검증할 수 있다.")
-    void givenExpiredToken_whenValidateToken_thenExceptionShouldBeThrown() {
+    @Test
+    void validateTokenWithExpired() {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = Duration.ofMillis(1L);
+        expiration = Duration.ZERO;
         sut = new JwtTokenProvider(secretString, expiration);
         String username = String.valueOf(1L);
         String result = sut.generateToken(username);
 
         //expected
-        Assertions.assertThatThrownBy(() -> sut.validateToken(result))
+        assertThatThrownBy(() -> sut.validateToken(result))
                 .isInstanceOf(ExpiredJwtException.class);
     }
 
+    @DisplayName("잘못된 토큰을 검증할 수 있다.")
     @Test
-    @DisplayName("잘못된 형식의 토큰을 검증할 수 있다.")
-    void givenInvalidJwtToken_whenValidateToken_thenExceptionShouldBeThrown() {
+    void validateTokenWithInvalidJwtToken() {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
         expiration = Duration.ofMillis(5 * 1000L);
         sut = new JwtTokenProvider(secretString, expiration);
 
-        //expected
         String wrongToken = "wrongToken";
-        Assertions.assertThatThrownBy(() -> sut.validateToken(wrongToken))
+
+        //expected
+        assertThatThrownBy(() -> sut.validateToken(wrongToken))
                 .isInstanceOf(MalformedJwtException.class);
     }
 
     @Test
-    @DisplayName("다른 키로 만든 토큰을 검증할 수 있다.")
-    void givenJwtTokenWithDifferentKey_whenValidateToken_thenExceptionShouldBeThrown() {
+    @DisplayName("다른 키로 서명한 토큰을 검증할 수 있다.")
+    void validateTokenWithGeneratedDifferentSignature() {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
@@ -92,31 +91,85 @@ class JwtTokenProviderTest {
         sut = new JwtTokenProvider(newSecretString, expiration);
 
         //expected
-        Assertions.assertThatThrownBy(() -> sut.validateToken(token))
+        assertThatThrownBy(() -> sut.validateToken(token))
                 .isInstanceOf(SignatureException.class);
     }
 
-    @Test
     @DisplayName("토큰에서 username을 조회할 수 있다.")
-    void givenValidToken_whenGetUsernameFromToken_thenUsernameIsReturned() {
+    @Test
+    void getUsernameFrom() {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = Duration.ofMillis(5 * 1000L);
+        expiration = Duration.ofSeconds(5);
         sut = new JwtTokenProvider(secretString, expiration);
         String username = String.valueOf(1L);
         String token = sut.generateToken(username);
 
         //when
-        String result = sut.getUsernameFromToken(token);
+        String result = sut.getUsernameFrom(token);
 
         //when
         assertThat(result).isEqualTo(username);
     }
 
     @Test
-    @DisplayName("토큰에서 만료날짜를 가져올 수 있다.")
-    void givenValidToken_whenGetExpiration_thenExpirationDateIsReturned() {
+    @DisplayName("만료된 토큰에서 username을 조회할 수 있다.")
+    void getUsernameFromExpired() {
+        //given
+        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        secretString = Encoders.BASE64.encode(key.getEncoded());
+        expiration = Duration.ZERO;
+        sut = new JwtTokenProvider(secretString, expiration);
+        String username = String.valueOf(1L);
+        String token = sut.generateToken(username);
+
+        //when
+        String result = sut.getUsernameFrom(token);
+
+        //when
+        assertThat(result).isEqualTo(username);
+    }
+
+    @Test
+    @DisplayName("잘못된 토큰에서 username을 가져올 수 없다.")
+    void getUsernameFromWrong() {
+        //given
+        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        secretString = Encoders.BASE64.encode(key.getEncoded());
+        expiration = Duration.ofMillis(5 * 1000L);
+        sut = new JwtTokenProvider(secretString, expiration);
+        String wrongToken = "wrongToken";
+
+        //expected
+        assertThatThrownBy(() -> sut.getUsernameFrom(wrongToken))
+                .isInstanceOf(MalformedJwtException.class);
+    }
+
+    @Test
+    @DisplayName("다른 키로 서명한 토큰에서 username을 가져올 수 없다.")
+    void getUsernameFromDifferentSignature() {
+        //given
+        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        secretString = Encoders.BASE64.encode(key.getEncoded());
+        expiration = Duration.ofMillis(5 * 1000L);
+        sut = new JwtTokenProvider(secretString, expiration);
+
+        String username = String.valueOf(1L);
+        String token = sut.generateToken(username);
+
+        SecretKey anotherKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        String newSecretString = Encoders.BASE64.encode(anotherKey.getEncoded());
+        sut = new JwtTokenProvider(newSecretString, expiration);
+
+        //expected
+        assertThatThrownBy(() -> sut.getUsernameFrom(token))
+                .isInstanceOf(SignatureException.class);
+    }
+
+    @Test
+    @DisplayName("토큰에서 만료시간을 가져올 수 있다.")
+    void getExpiration() {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
@@ -129,16 +182,17 @@ class JwtTokenProviderTest {
         LocalDateTime result = sut.getExpiration(token);
 
         //then
-        LocalDateTime issuedDateTime = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
+        LocalDateTime issuedDateTime = Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token)
                 .getBody().getIssuedAt().toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
         assertThat(result).isEqualToIgnoringNanos(issuedDateTime.plusSeconds(60));
     }
 
+    @DisplayName("만료된 토큰에서 만료시간을 가져올 수 없다.")
     @Test
-    @DisplayName("만료된 토큰에서 username을 조회할 수 있다.")
-    void givenExpiredToken_whenGetUsernameFromToken_thenUsernameIsReturned() {
+    void getExpirationWithExpired() {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
@@ -147,16 +201,30 @@ class JwtTokenProviderTest {
         String username = String.valueOf(1L);
         String token = sut.generateToken(username);
 
-        //when
-        String result = sut.getUsernameFromToken(token);
-
-        //when
-        assertThat(result).isEqualTo(username);
+        //expected
+        assertThatThrownBy(() -> sut.getExpiration(token))
+                .isInstanceOf(ExpiredJwtException.class);
     }
 
+    @DisplayName("잘못된 토큰에서 만료시간을 가져올 수 없다.")
     @Test
-    @DisplayName("다른 키로 만든 토큰에서 username을 가져올 수 없다.")
-    void givenDifferentKey_whenGetUsernameFromToken_thenExceptionShouldBeThrown() {
+    void getExpirationWithWrong() {
+        // given
+        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        secretString = Encoders.BASE64.encode(key.getEncoded());
+        expiration = Duration.ofSeconds(5);
+        sut = new JwtTokenProvider(secretString, expiration);
+
+        String token = "wrong";
+
+        // expected
+        assertThatThrownBy(() -> sut.getExpiration(token))
+                .isInstanceOf(MalformedJwtException.class);
+    }
+
+    @DisplayName("다른 키로 서명한 토큰에서 만료시간을 가져올 수 없다.")
+    @Test
+    void getExpirationWithDifferentSignature() {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
@@ -171,22 +239,8 @@ class JwtTokenProviderTest {
         sut = new JwtTokenProvider(newSecretString, expiration);
 
         //expected
-        Assertions.assertThatThrownBy(() -> sut.getUsernameFromToken(token))
+        assertThatThrownBy(() -> sut.getExpiration(token))
                 .isInstanceOf(SignatureException.class);
-    }
 
-    @Test
-    @DisplayName("잘못된 토큰에서 username을 가져올 수 없다.")
-    void givenInvalidToken_whenGetUsernameFromToken_thenExceptionShouldBeThrown() {
-        //given
-        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = Duration.ofMillis(5 * 1000L);
-        sut = new JwtTokenProvider(secretString, expiration);
-
-        //expected
-        String wrongToken = "wrongToken";
-        Assertions.assertThatThrownBy(() -> sut.getUsernameFromToken(wrongToken))
-                .isInstanceOf(MalformedJwtException.class);
     }
 }

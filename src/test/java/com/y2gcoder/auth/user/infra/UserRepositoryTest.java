@@ -6,6 +6,7 @@ import com.y2gcoder.auth.user.application.UserRepository;
 import com.y2gcoder.auth.user.domain.User;
 import com.y2gcoder.auth.user.domain.UserId;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -61,4 +62,27 @@ class UserRepositoryTest {
         // then
         assertThat(result).isEqualTo(user);
     }
+
+    @DisplayName("이메일로 유저를 찾을 수 있다.")
+    @Test
+    void findByEmail() {
+        // given
+        String email = "test@test.com";
+        userJpaRepository.save(new UserJpaEntity(
+                "userId",
+                email,
+                "test1234",
+                "name",
+                null
+        ));
+
+        // when
+        Optional<User> result = sut.findByEmail(email);
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().getId()).isEqualTo(UserId.of("userId"));
+    }
+
+
 }

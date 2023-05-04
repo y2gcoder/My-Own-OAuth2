@@ -2,6 +2,7 @@ package com.y2gcoder.auth.user.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,4 +33,26 @@ class UserJpaRepositoryTest {
         // then
         assertThat(result).isTrue();
     }
+
+    @DisplayName("이메일로 유저를 조회할 수 있다.")
+    @Test
+    void findByEmail() {
+        // given
+        UserJpaEntity userJpaEntity = sut.save(new UserJpaEntity(
+                "id",
+                "test@test.com",
+                "password",
+                "name",
+                null
+        ));
+
+        // when
+        Optional<UserJpaEntity> result = sut.findByEmail(userJpaEntity.getEmail());
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo(userJpaEntity);
+    }
+
+
 }

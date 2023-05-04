@@ -16,8 +16,9 @@ public class FakeAuthorizationCodeRepository implements AuthorizationCodeReposit
     private final Map<AuthorizationCodeId, AuthorizationCode> fakeAuthorizationCodes = new HashMap<>();
 
     @Override
-    public void save(AuthorizationCode authorizationCode) {
+    public AuthorizationCode save(AuthorizationCode authorizationCode) {
         fakeAuthorizationCodes.put(authorizationCode.getId(), authorizationCode);
+        return authorizationCode;
     }
 
     @Override

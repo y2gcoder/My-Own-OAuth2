@@ -7,11 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import lombok.Getter;
 
-@Data
+@Getter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @AllArgsConstructor
 public class IssueAuthorizationCodeResponse {
+
     private String code;
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private LocalDateTime expirationTime;

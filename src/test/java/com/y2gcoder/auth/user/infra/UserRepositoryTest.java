@@ -60,7 +60,8 @@ class UserRepositoryTest {
         User result = sut.save(user);
 
         // then
-        assertThat(result).isEqualTo(user);
+        Optional<UserJpaEntity> optionalEntity = userJpaRepository.findById("id");
+        assertThat(optionalEntity).isPresent();
     }
 
     @DisplayName("이메일로 유저를 찾을 수 있다.")

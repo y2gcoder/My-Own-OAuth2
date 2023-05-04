@@ -1,7 +1,6 @@
 package com.y2gcoder.auth.auth.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.y2gcoder.auth.auth.application.AuthorizationCodeRepository;
 import com.y2gcoder.auth.auth.domain.AuthorizationCode;

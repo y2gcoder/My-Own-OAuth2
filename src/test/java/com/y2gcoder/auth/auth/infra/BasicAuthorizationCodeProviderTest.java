@@ -1,7 +1,6 @@
 package com.y2gcoder.auth.auth.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeProvider;
 import com.y2gcoder.auth.common.infra.StubTime;
@@ -9,7 +8,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

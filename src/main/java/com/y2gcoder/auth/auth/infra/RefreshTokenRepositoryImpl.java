@@ -4,31 +4,22 @@ import com.y2gcoder.auth.auth.application.RefreshTokenRepository;
 import com.y2gcoder.auth.auth.domain.RefreshToken;
 import com.y2gcoder.auth.auth.domain.RefreshTokenId;
 import com.y2gcoder.auth.user.domain.UserId;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
+
     private final RefreshTokenJpaRepository refreshTokenJpaRepository;
 
     @Override
-    public void save(RefreshToken refreshToken) {
-        RefreshTokenJpaEntity refreshTokenJpaEntity = RefreshTokenJpaEntity.fromDomain(refreshToken);
-        refreshTokenJpaRepository.save(refreshTokenJpaEntity);
-    }
-
-    @Override
-    public Optional<RefreshToken> findById(RefreshTokenId id) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<RefreshToken> findByToken(String token) {
-        return Optional.empty();
+    public RefreshToken save(RefreshToken refreshToken) {
+        RefreshTokenJpaEntity refreshTokenJpaEntity = RefreshTokenJpaEntity.fromDomain(
+                refreshToken);
+        return refreshTokenJpaRepository.save(refreshTokenJpaEntity).toDomain();
     }
 
     @Override

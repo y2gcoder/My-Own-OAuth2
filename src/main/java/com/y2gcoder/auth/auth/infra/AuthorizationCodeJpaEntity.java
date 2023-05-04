@@ -5,21 +5,26 @@ import com.y2gcoder.auth.auth.domain.AuthorizationCodeId;
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeStatus;
 import com.y2gcoder.auth.common.infra.BaseTimeEntity;
 import com.y2gcoder.auth.user.domain.UserId;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "authorization_codes")
 public class AuthorizationCodeJpaEntity extends BaseTimeEntity {
+
     @Id
     private String id;
-
 
     private String code;
 

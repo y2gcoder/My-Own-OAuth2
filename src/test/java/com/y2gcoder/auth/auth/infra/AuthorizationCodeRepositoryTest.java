@@ -68,4 +68,54 @@ class AuthorizationCodeRepositoryTest {
                 .findById(result.getId().getValue());
         assertThat(entityOptional).isPresent();
     }
+
+    @DisplayName("code로 인증 코드 도메인을 조회할 수 있다.")
+    @Test
+    void findByCode() {
+        // given
+        String targetCode = "code";
+        LocalDateTime expirationTime = LocalDateTime.of(2023, 5, 4, 14, 25);
+        AuthorizationCodeJpaEntity authorizationCodeJpaEntity = authorizationCodeJpaRepository.save(
+                new AuthorizationCodeJpaEntity(
+                        "id",
+                        targetCode,
+                        AuthorizationCodeStatus.ISSUED,
+                        expirationTime,
+                        "userId"
+                ));
+
+        // when
+        Optional<AuthorizationCode> result = sut.findByCode(targetCode);
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get().getId()).isEqualTo(AuthorizationCodeId.of("id"));
+
+    }
+
+    @DisplayName("컨슈머를 받아 인증 코드를 수정할 수 있다.")
+    @Test
+    void update() {
+        // given
+        String targetCode = "code";
+        LocalDateTime expirationTime = LocalDateTime.of(2023, 5, 4, 14, 25);
+        authorizationCodeJpaRepository.save(
+                new AuthorizationCodeJpaEntity(
+                        "id",
+                        targetCode,
+                        AuthorizationCodeStatus.ISSUED,
+                        expirationTime,
+                        "userId"
+                ));
+
+        AuthorizationCodeId authorizationCodeId = AuthorizationCodeId.of("id");
+
+        // when
+        sut.update(authorizationCodeId, AuthorizationCode::markAsUsed);
+
+        // then
+        AuthorizationCodeJpaEntity jpaEntity = authorizationCodeJpaRepository.findById(
+                authorizationCodeId.getValue()).get();
+        assertThat(jpaEntity.getStatus()).isEqualByComparingTo(AuthorizationCodeStatus.USED);
+    }
 }

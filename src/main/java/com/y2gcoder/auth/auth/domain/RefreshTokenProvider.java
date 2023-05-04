@@ -1,9 +1,10 @@
 package com.y2gcoder.auth.auth.domain;
 
-import java.time.Duration;
+import java.time.LocalDateTime;
 
 public interface RefreshTokenProvider {
+
     String generateToken();
 
-    Duration getExpiration();
+    LocalDateTime getExpirationTime(LocalDateTime currentTime);
 }

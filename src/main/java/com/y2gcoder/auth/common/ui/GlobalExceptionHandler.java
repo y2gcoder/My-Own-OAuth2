@@ -1,5 +1,7 @@
 package com.y2gcoder.auth.common.ui;
 
+import com.y2gcoder.auth.auth.application.NotFoundAuthorizationCodeException;
+import com.y2gcoder.auth.auth.application.UnavailableAuthorizationCodeException;
 import com.y2gcoder.auth.auth.infra.InvalidPasswordException;
 import com.y2gcoder.auth.auth.infra.NotFoundOwnerException;
 import com.y2gcoder.auth.user.application.UserWithEmailExistsException;
@@ -13,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     /**
-     * 유저
+     * 회원가입
      */
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(UserWithEmailExistsException.class)
@@ -25,7 +27,7 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 인증 코드
+     * 인증 코드 발급
      */
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundOwnerException.class)
@@ -45,6 +47,27 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
+    /**
+     * 토큰 발급
+     */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(NotFoundAuthorizationCodeException.class)
+    public ErrorResponse notFoundAuthorizationCodeException(NotFoundAuthorizationCodeException e) {
+        return ErrorResponse.builder()
+                .code(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(UnavailableAuthorizationCodeException.class)
+    public ErrorResponse unavailableAuthorizationCodeException(
+            UnavailableAuthorizationCodeException e) {
+        return ErrorResponse.builder()
+                .code(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
+                .message(e.getMessage())
+                .build();
+    }
 
     /**
      * 공통

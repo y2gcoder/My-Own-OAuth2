@@ -96,7 +96,7 @@ class SignUpServiceTest {
         // expected
         assertThatThrownBy(() -> sut.signUp(email, password, name))
                 .isInstanceOf(UserWithEmailExistsException.class)
-                .hasMessage(String.format("해당 이메일을 가진 회원이 존재하지 않습니다. email=%s", email));
+                .hasMessage(String.format("해당 이메일을 가진 회원이 이미 존재합니다. email=%s", email));
 
     }
 }

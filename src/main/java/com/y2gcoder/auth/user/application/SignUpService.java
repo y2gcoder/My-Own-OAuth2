@@ -17,9 +17,7 @@ public class SignUpService {
         checkIfUserExistsByEmail(email);
 
         UserId userId = userRepository.nextUserId();
-        User user = new User(userId, email, password, name, null);
-        userRepository.save(user);
-        return user;
+        return userRepository.save(new User(userId, email, password, name, null));
     }
 
     private void validatePassword(String password) {

@@ -26,14 +26,15 @@ public class JwtTokenProvider {
         this.expiration = expiration;
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, LocalDateTime issuedAt) {
         return Jwts.builder()
                 .signWith(key)
                 .setId(UUID.randomUUID().toString())
                 .setHeaderParam("typ", "JWT")
                 .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration.toMillis()))
+                .setIssuedAt(Date.from(issuedAt.atZone(ZoneId.systemDefault()).toInstant()))
+                .setExpiration(Date.from(
+                        issuedAt.plus(expiration).atZone(ZoneId.systemDefault()).toInstant()))
                 .compact();
     }
 

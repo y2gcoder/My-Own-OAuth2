@@ -36,7 +36,8 @@ class JwtTokenProviderTest {
         String username = String.valueOf(1L);
 
         //when
-        String result = sut.generateToken(username);
+        LocalDateTime issuedAt = LocalDateTime.now();
+        String result = sut.generateToken(username, issuedAt);
 
         //then
         sut.validateToken(result);
@@ -50,8 +51,10 @@ class JwtTokenProviderTest {
         secretString = Encoders.BASE64.encode(key.getEncoded());
         expiration = Duration.ZERO;
         sut = new JwtTokenProvider(secretString, expiration);
+
         String username = String.valueOf(1L);
-        String result = sut.generateToken(username);
+        LocalDateTime issuedAt = LocalDateTime.now();
+        String result = sut.generateToken(username, issuedAt);
 
         //expected
         assertThatThrownBy(() -> sut.validateToken(result))
@@ -80,11 +83,12 @@ class JwtTokenProviderTest {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = Duration.ofMillis(5 * 1000L);
+        expiration = Duration.ofSeconds(5);
         sut = new JwtTokenProvider(secretString, expiration);
 
         String username = String.valueOf(1L);
-        String token = sut.generateToken(username);
+        LocalDateTime issuedAt = LocalDateTime.now();
+        String token = sut.generateToken(username, issuedAt);
 
         SecretKey anotherKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         String newSecretString = Encoders.BASE64.encode(anotherKey.getEncoded());
@@ -103,8 +107,10 @@ class JwtTokenProviderTest {
         secretString = Encoders.BASE64.encode(key.getEncoded());
         expiration = Duration.ofSeconds(5);
         sut = new JwtTokenProvider(secretString, expiration);
+
         String username = String.valueOf(1L);
-        String token = sut.generateToken(username);
+        LocalDateTime issuedAt = LocalDateTime.now();
+        String token = sut.generateToken(username, issuedAt);
 
         //when
         String result = sut.getUsernameFrom(token);
@@ -121,8 +127,10 @@ class JwtTokenProviderTest {
         secretString = Encoders.BASE64.encode(key.getEncoded());
         expiration = Duration.ZERO;
         sut = new JwtTokenProvider(secretString, expiration);
+
         String username = String.valueOf(1L);
-        String token = sut.generateToken(username);
+        LocalDateTime issuedAt = LocalDateTime.now();
+        String token = sut.generateToken(username, issuedAt);
 
         //when
         String result = sut.getUsernameFrom(token);
@@ -152,11 +160,12 @@ class JwtTokenProviderTest {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = Duration.ofMillis(5 * 1000L);
+        expiration = Duration.ofSeconds(5);
         sut = new JwtTokenProvider(secretString, expiration);
 
         String username = String.valueOf(1L);
-        String token = sut.generateToken(username);
+        LocalDateTime issuedAt = LocalDateTime.now();
+        String token = sut.generateToken(username, issuedAt);
 
         SecretKey anotherKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         String newSecretString = Encoders.BASE64.encode(anotherKey.getEncoded());
@@ -175,8 +184,10 @@ class JwtTokenProviderTest {
         secretString = Encoders.BASE64.encode(key.getEncoded());
         expiration = Duration.ofSeconds(60L);
         sut = new JwtTokenProvider(secretString, expiration);
+
         String username = String.valueOf(1L);
-        String token = sut.generateToken(username);
+        LocalDateTime issuedAt = LocalDateTime.now();
+        String token = sut.generateToken(username, issuedAt);
 
         //when
         LocalDateTime result = sut.getExpiration(token);
@@ -198,8 +209,10 @@ class JwtTokenProviderTest {
         secretString = Encoders.BASE64.encode(key.getEncoded());
         expiration = Duration.ZERO;
         sut = new JwtTokenProvider(secretString, expiration);
+
         String username = String.valueOf(1L);
-        String token = sut.generateToken(username);
+        LocalDateTime issuedAt = LocalDateTime.now();
+        String token = sut.generateToken(username, issuedAt);
 
         //expected
         assertThatThrownBy(() -> sut.getExpiration(token))
@@ -228,11 +241,12 @@ class JwtTokenProviderTest {
         //given
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         secretString = Encoders.BASE64.encode(key.getEncoded());
-        expiration = Duration.ofMillis(5 * 1000L);
+        expiration = Duration.ofSeconds(5);
         sut = new JwtTokenProvider(secretString, expiration);
 
         String username = String.valueOf(1L);
-        String token = sut.generateToken(username);
+        LocalDateTime issuedAt = LocalDateTime.now();
+        String token = sut.generateToken(username, issuedAt);
 
         SecretKey anotherKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         String newSecretString = Encoders.BASE64.encode(anotherKey.getEncoded());

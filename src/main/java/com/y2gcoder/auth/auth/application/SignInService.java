@@ -27,7 +27,7 @@ public class SignInService {
         UserId ownerId = authorizationCode.getOwnerId();
 
         //소유자 id를 사용해서 access token을 만든다.
-        String accessToken = jwtTokenProvider.generateToken(ownerId.getValue());
+        String accessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
         LocalDateTime accessTokenExpirationTime = jwtTokenProvider.getExpiration(accessToken);
 
         //소유자 id를 사용해서 refresh token을 만든다.

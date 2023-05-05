@@ -1,104 +1,67 @@
 package com.y2gcoder.auth.auth.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.y2gcoder.auth.auth.AuthIntegrationTestSupport;
 import com.y2gcoder.auth.auth.domain.AuthorizationCode;
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeProvider;
-import com.y2gcoder.auth.auth.domain.OwnerService;
-import com.y2gcoder.auth.auth.infra.BasicAuthorizationCodeProvider;
-import com.y2gcoder.auth.auth.infra.FakeAuthorizationCodeRepository;
-import com.y2gcoder.auth.auth.infra.StubOwnerService;
-import com.y2gcoder.auth.common.application.Time;
-import com.y2gcoder.auth.common.infra.StubTime;
+import com.y2gcoder.auth.auth.infra.AuthorizationCodeJpaRepository;
+import com.y2gcoder.auth.user.domain.UserId;
+import com.y2gcoder.auth.user.infra.UserJpaEntity;
+import com.y2gcoder.auth.user.infra.UserJpaRepository;
+import java.time.LocalDateTime;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
+class IssueAuthorizationCodeServiceTest extends AuthIntegrationTestSupport {
 
-import static org.assertj.core.api.Assertions.assertThat;
+    @Autowired
+    private UserJpaRepository userJpaRepository;
 
-class IssueAuthorizationCodeServiceTest {
-    private OwnerService ownerService;
-    private AuthorizationCodeRepository authorizationCodeRepository;
+    @Autowired
+    private AuthorizationCodeJpaRepository authorizationCodeJpaRepository;
+
+    @Autowired
     private AuthorizationCodeProvider authorizationCodeProvider;
 
+    @Autowired
     private IssueAuthorizationCodeService sut;
 
     @BeforeEach
     void setUp() {
-        ownerService = new StubOwnerService();
-        authorizationCodeRepository = new FakeAuthorizationCodeRepository();
-        Time time = new StubTime(LocalDateTime.of(2023, 4, 24, 17, 48));
-        Duration expiration = Duration.ofMinutes(5);
-        authorizationCodeProvider = new BasicAuthorizationCodeProvider(time, expiration);
-        sut = new IssueAuthorizationCodeService(
-                ownerService,
-                authorizationCodeRepository,
-                authorizationCodeProvider
-        );
+        userJpaRepository.save(new UserJpaEntity(
+                "userId",
+                "test@test.com",
+                "test1234",
+                "name",
+                null
+        ));
     }
 
-    @Test
+    @AfterEach
+    void tearDown() {
+        authorizationCodeJpaRepository.deleteAllInBatch();
+        userJpaRepository.deleteAllInBatch();
+    }
+
     @DisplayName("인증 코드를 발급할 수 있다.")
-    void whenIssueAuthorizationCode_thenAuthorizationCodeIsReturned() {
-        //given
-        String email = "test@test.com";
-        String password = "password";
-
-        Time time = new StubTime(LocalDateTime.now());
-        Duration expiration = Duration.ofMinutes(5);
-        sut = new IssueAuthorizationCodeService(
-                ownerService,
-                authorizationCodeRepository,
-                new BasicAuthorizationCodeProvider(time, expiration)
-        );
-
-        //when
-        AuthorizationCode result = sut.issueAuthorizationCode(email, password);
-
-        //then
-        assertThat(result.isAvailable()).isTrue();
-        assertThat(result.getExpirationTime()).isEqualToIgnoringNanos(time.now().plusMinutes(5));
-    }
-
     @Test
-    @DisplayName("만료된 인증 코드는 사용할 수 없다.")
-    void givenExpiredAuthorizationCode_whenIssueAuthorizationCode_thenAuthorizationCodeIsUnavailable() {
-        //given
-        String email = "test@test.com";
-        String password = "password";
+    void issueAuthorizationCode() {
+        // when
+        LocalDateTime currentTime = LocalDateTime
+                .of(2023, 5, 5, 23, 2, 0);
+        AuthorizationCode result = sut
+                .issueAuthorizationCode("test@test.com", "test1234", currentTime);
 
-        //when
-        AuthorizationCode result = sut.issueAuthorizationCode(email, password);
-
-        //then
-        assertThat(result.isExpired()).isTrue();
-        assertThat(result.isUsed()).isFalse();
-        assertThat(result.isAvailable()).isFalse();
-    }
-
-    @Test
-    @DisplayName("사용한 인증 코드는 재사용할 수 없다.")
-    void givenUsedAuthorizationCode_whenIssueAuthorizationCode_thenAuthorizationCodeIsUnavailable() {
-        //given
-        String email = "test@test.com";
-        String password = "password";
-
-        Time time = new StubTime(LocalDateTime.now());
-        Duration expiration = Duration.ofMinutes(5);
-        sut = new IssueAuthorizationCodeService(
-                ownerService,
-                authorizationCodeRepository,
-                new BasicAuthorizationCodeProvider(time, expiration)
-        );
-
-        //when
-        AuthorizationCode result = sut.issueAuthorizationCode(email, password);
-        result.markAsUsed();
-
-        //then
-        assertThat(result.isUsed()).isTrue();
-        assertThat(result.isExpired()).isFalse();
-        assertThat(result.isAvailable()).isFalse();
+        // then
+        LocalDateTime referenceTime = authorizationCodeProvider.getExpirationTime(currentTime)
+                .minusNanos(1);
+        assertThat(result).isNotNull();
+        assertThat(result.isAvailable(referenceTime)).isTrue();
+        assertThat(result.getCode()).isNotNull();
+        assertThat(result.getOwnerId()).isEqualTo(UserId.of("userId"));
     }
 }

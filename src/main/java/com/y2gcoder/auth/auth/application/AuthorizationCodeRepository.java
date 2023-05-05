@@ -7,7 +7,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public interface AuthorizationCodeRepository {
-    void save(AuthorizationCode authorizationCode);
+
+    AuthorizationCode save(AuthorizationCode authorizationCode);
 
     AuthorizationCodeId nextAuthorizationCodeId();
 

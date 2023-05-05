@@ -1,23 +1,23 @@
 package com.y2gcoder.auth.auth.infra;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
-import lombok.extern.slf4j.Slf4j;
-
 import java.security.Key;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class JwtTokenProvider {
+
     private final Key key;
     private final Duration expiration;
 
@@ -26,66 +26,59 @@ public class JwtTokenProvider {
         this.expiration = expiration;
     }
 
-    public String generateToken(String username) {
+    public String generateToken(String username, LocalDateTime issuedAt) {
         return Jwts.builder()
                 .signWith(key)
                 .setId(UUID.randomUUID().toString())
                 .setHeaderParam("typ", "JWT")
                 .setSubject(username)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration.toMillis()))
+                .setIssuedAt(Date.from(issuedAt.atZone(ZoneId.systemDefault()).toInstant()))
+                .setExpiration(Date.from(
+                        issuedAt.plus(expiration).atZone(ZoneId.systemDefault()).toInstant()))
                 .compact();
     }
 
-    public void validateToken(String token) {
+    private Jws<Claims> getClaims(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-        } catch (ExpiredJwtException e) {
-            log.warn("Jwt Token is Expired");
-            throw e;
-        } catch (UnsupportedJwtException e) {
-            log.warn("Jwt Token is invalid");
-            throw e;
-        } catch (MalformedJwtException e) {
-            log.warn("Jwt Token is invalid");
-            throw e;
-        } catch (SignatureException e) {
-            log.warn("Jwt signature validation fails");
+            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+        } catch (JwtException e) {
+            log.warn("Jwt Token is invalid or expired", e);
             throw e;
         } catch (IllegalArgumentException e) {
-            log.warn("Jwt Token is invalid");
+            log.warn("Jwt Token is empty", e);
             throw e;
         }
-
     }
 
-    public String getUsernameFromToken(String token) {
+    public void validateToken(String token) {
+        getClaims(token);
+    }
+
+    public String getUsernameFrom(String token) {
+        Jws<Claims> claims;
         try {
-            return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
-                    .getBody().getSubject();
+            claims = getClaims(token);
         } catch (ExpiredJwtException e) {
             log.info("Jwt Token is Expired");
             return e.getClaims().getSubject();
-        } catch (UnsupportedJwtException e) {
-            log.warn("Jwt Token is invalid");
-            throw e;
-        } catch (MalformedJwtException e) {
-            log.warn("Jwt Token is invalid");
-            throw e;
-        } catch (SignatureException e) {
-            log.warn("Jwt signature validation fails");
-            throw e;
-        } catch (IllegalArgumentException e) {
-            log.warn("Jwt Token is invalid");
-            throw e;
         }
+        return claims.getBody().getSubject();
     }
 
     public LocalDateTime getExpiration(String token) {
-        Date tokenExpirationDate = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
-                .getBody().getExpiration();
+        Jws<Claims> claims;
+        try {
+            claims = getClaims(token);
+        } catch (ExpiredJwtException e) {
+            log.info("Jwt Token is Expired");
+            return e.getClaims().getExpiration().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+        }
+        Date tokenExpirationDate = claims.getBody().getExpiration();
         return tokenExpirationDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
     }
+
 }

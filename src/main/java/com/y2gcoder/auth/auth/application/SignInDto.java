@@ -1,11 +1,12 @@
 package com.y2gcoder.auth.auth.application;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class SignInDto {
+
     private AccessTokenDto access;
     private RefreshTokenDto refresh;
 }

@@ -1,11 +1,9 @@
 package com.y2gcoder.auth.user.infra;
 
-import org.springframework.data.repository.Repository;
-
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserJpaRepository extends Repository<UserJpaEntity, String> {
-    void save(UserJpaEntity entity);
+public interface UserJpaRepository extends JpaRepository<UserJpaEntity, String> {
 
     boolean existsByEmail(String email);
 

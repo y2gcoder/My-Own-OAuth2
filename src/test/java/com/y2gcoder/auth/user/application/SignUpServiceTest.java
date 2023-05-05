@@ -1,62 +1,101 @@
 package com.y2gcoder.auth.user.application;
 
-import com.y2gcoder.auth.user.domain.User;
-import com.y2gcoder.auth.user.domain.UserId;
-import com.y2gcoder.auth.user.infra.FakeUserRepository;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class SignUpServiceTest {
+import com.y2gcoder.auth.user.UserIntegrationTestSupport;
+import com.y2gcoder.auth.user.domain.User;
+import com.y2gcoder.auth.user.domain.UserId;
+import com.y2gcoder.auth.user.infra.UserJpaEntity;
+import com.y2gcoder.auth.user.infra.UserJpaRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
+class SignUpServiceTest extends UserIntegrationTestSupport {
+
+    @Autowired
+    private UserJpaRepository userJpaRepository;
+
+    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
     private SignUpService sut;
 
-    @BeforeEach
-    void init() {
-        userRepository = new FakeUserRepository();
-        sut = new SignUpService(userRepository);
+    @AfterEach
+    void tearDown() {
+        userJpaRepository.deleteAllInBatch();
     }
 
-
+    @DisplayName("이메일, 비밀번호, 이름을 받아 유저를 생성한다.")
     @Test
-    @DisplayName("새로운 사용자를 만든다.")
-    void whenCreateUser_thenUserIsCreated() {
-        //given
+    void signUp() {
+        // given
         String email = "test@test.com";
-        String password = "password";
-        String name = "테스터";
+        String password = "test1234";
+        String name = "name";
 
-        //when
-        sut.signUp(email, password, name);
+        // when
+        User result = sut.signUp(email, password, name);
 
-        //then
-        Map<UserId, User> store = ((FakeUserRepository) userRepository).getStore();
-        Assertions.assertThat(store.values().stream().anyMatch(u -> u.getEmail().equals(email)))
-                .isTrue();
+        // then
+        assertThat(result.getId()).isNotNull();
+        assertThat(result).isNotNull()
+                .extracting("email", "password", "name", "deletedAt")
+                .contains(email, password, name, null);
     }
 
+    @DisplayName("유저를 생성할 때 비밀번호는 8자리 이상이어야 한다.")
     @Test
-    @DisplayName("같은 이메일을 가진 사용자를 둘 이상 만들 수 없다.")
-    void givenDuplicateEmail_whenCreateUser_thenExceptionShouldBeThrown() {
-        //given
+    void signUpWithShortPassword() {
+        // given
         String email = "test@test.com";
-        String password = "password";
-        String name = "테스터";
+        String password = "test123";
+        String name = "name";
+
+        // expected
+        assertThatThrownBy(() -> sut.signUp(email, password, name))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("비밀번호는 8자리 이상이어야 합니다.");
+    }
+
+    @DisplayName("유저를 생성할 때 이름은 2글자 이상이어야 한다.")
+    @Test
+    void signUpWithShortName() {
+        // given
+        String email = "test@test.com";
+        String password = "test1234";
+        String name = "한";
+
+        // expected
+        assertThatThrownBy(() -> sut.signUp(email, password, name))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("이름은 2글자 이상이어야 합니다.");
+    }
+
+    @DisplayName("이미 존재하는 유저의 이메일로 유저를 생성할 수 없다.")
+    @Test
+    void signUpWithEmailAlreadyExists() {
+        // given
         UserId userId = userRepository.nextUserId();
-        User user = new User(userId, email, password, name, null);
-        userRepository.save(user);
+        String email = "test@test.com";
+        String password = "test1234";
+        String name = "name";
 
-        //expected
-        String newPassword = "newpassword";
-        String newName = "새로운 테스터";
-        assertThatThrownBy(() -> sut.signUp(email, newPassword, name))
-                .isInstanceOf(UserWithEmailExistsException.class);
+        userJpaRepository.save(new UserJpaEntity(
+                userId.getValue(),
+                email,
+                password,
+                name,
+                null
+        ));
+
+        // expected
+        assertThatThrownBy(() -> sut.signUp(email, password, name))
+                .isInstanceOf(UserWithEmailExistsException.class)
+                .hasMessage(String.format("해당 이메일을 가진 회원이 이미 존재합니다. email=%s", email));
+
     }
-
 }

@@ -1,27 +1,28 @@
 package com.y2gcoder.auth.auth.infra;
 
 import com.y2gcoder.auth.auth.application.AuthorizationCodeRepository;
+import com.y2gcoder.auth.auth.application.NotFoundAuthorizationCodeException;
 import com.y2gcoder.auth.auth.domain.AuthorizationCode;
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeId;
-import com.y2gcoder.auth.auth.domain.NotFoundAuthorizationCodeException;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Consumer;
-
 @Repository
 @RequiredArgsConstructor
 public class AuthorizationCodeRepositoryImpl implements AuthorizationCodeRepository {
+
     private final AuthorizationCodeJpaRepository authorizationCodeJpaRepository;
 
+    @Transactional
     @Override
-    public void save(AuthorizationCode authorizationCode) {
+    public AuthorizationCode save(AuthorizationCode authorizationCode) {
         AuthorizationCodeJpaEntity authorizationCodeJpaEntity = AuthorizationCodeJpaEntity
                 .fromDomain(authorizationCode);
-        authorizationCodeJpaRepository.save(authorizationCodeJpaEntity);
+        return authorizationCodeJpaRepository.save(authorizationCodeJpaEntity).toDomain();
     }
 
     @Override
@@ -29,15 +30,18 @@ public class AuthorizationCodeRepositoryImpl implements AuthorizationCodeReposit
         return AuthorizationCodeId.of(UUID.randomUUID().toString());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<AuthorizationCode> findByCode(String code) {
-        return authorizationCodeJpaRepository.findByCode(code).map(AuthorizationCodeJpaEntity::toDomain);
+        return authorizationCodeJpaRepository.findByCode(code)
+                .map(AuthorizationCodeJpaEntity::toDomain);
     }
 
     @Transactional
     @Override
     public void update(AuthorizationCodeId id, Consumer<AuthorizationCode> modifier) {
-        AuthorizationCodeJpaEntity authorizationCodeJpaEntity = authorizationCodeJpaRepository.findById(id.getValue())
+        AuthorizationCodeJpaEntity authorizationCodeJpaEntity = authorizationCodeJpaRepository.findById(
+                        id.getValue())
                 .orElseThrow(NotFoundAuthorizationCodeException::new);
         AuthorizationCode authorizationCode = authorizationCodeJpaEntity.toDomain();
         modifier.accept(authorizationCode);

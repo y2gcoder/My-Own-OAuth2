@@ -1,7 +1,6 @@
 package com.y2gcoder.auth.auth.infra;
 
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeProvider;
-import com.y2gcoder.auth.common.application.Time;
 import lombok.RequiredArgsConstructor;
 
 import java.time.Duration;
@@ -10,7 +9,6 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 public class BasicAuthorizationCodeProvider implements AuthorizationCodeProvider {
-    private final Time time;
     private final Duration expiration;
 
     @Override
@@ -19,7 +17,7 @@ public class BasicAuthorizationCodeProvider implements AuthorizationCodeProvider
     }
 
     @Override
-    public LocalDateTime getExpirationTime() {
-        return time.now().plus(expiration);
+    public LocalDateTime getExpirationTime(LocalDateTime currentTime) {
+        return currentTime.plus(expiration);
     }
 }

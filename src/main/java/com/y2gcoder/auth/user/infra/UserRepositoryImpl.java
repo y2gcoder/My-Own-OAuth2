@@ -8,16 +8,19 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
+
     private final UserJpaRepository userJpaRepository;
 
+    @Transactional
     @Override
-    public void save(User user) {
+    public User save(User user) {
         UserJpaEntity userJpaEntity = UserJpaEntity.fromDomain(user);
-        userJpaRepository.save(userJpaEntity);
+        return userJpaRepository.save(userJpaEntity).toDomain();
     }
 
     @Override
@@ -25,11 +28,13 @@ public class UserRepositoryImpl implements UserRepository {
         return UserId.of(UUID.randomUUID().toString());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public boolean existsByEmail(String email) {
         return userJpaRepository.existsByEmail(email);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<User> findByEmail(String email) {
         Optional<UserJpaEntity> optionalUserJpaEntity = userJpaRepository.findByEmail(email);

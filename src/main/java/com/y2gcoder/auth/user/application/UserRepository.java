@@ -6,7 +6,8 @@ import com.y2gcoder.auth.user.domain.UserId;
 import java.util.Optional;
 
 public interface UserRepository {
-    void save(User user);
+
+    User save(User user);
 
     UserId nextUserId();
 

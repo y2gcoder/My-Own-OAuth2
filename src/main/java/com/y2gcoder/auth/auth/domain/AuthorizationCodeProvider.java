@@ -6,5 +6,5 @@ import java.time.LocalDateTime;
 public interface AuthorizationCodeProvider {
     String generateCode();
 
-    LocalDateTime getExpirationTime();
+    LocalDateTime getExpirationTime(LocalDateTime currentTime);
 }

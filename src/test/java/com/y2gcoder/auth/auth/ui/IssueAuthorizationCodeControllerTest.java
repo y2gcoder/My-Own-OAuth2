@@ -8,8 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.y2gcoder.auth.auth.application.IssueAuthorizationCodeService;
+import com.y2gcoder.auth.auth.AuthWebMvcTestSupport;
 import com.y2gcoder.auth.auth.domain.AuthorizationCode;
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeId;
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeStatus;
@@ -20,23 +19,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(controllers = IssueAuthorizationCodeController.class)
-class IssueAuthorizationCodeControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private IssueAuthorizationCodeService issueAuthorizationCodeService;
+class IssueAuthorizationCodeControllerTest extends AuthWebMvcTestSupport {
 
     @DisplayName("이메일과 비밀번호로 인증 코드를 발급한다.")
     @Test

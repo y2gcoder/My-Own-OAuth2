@@ -2,6 +2,7 @@ package com.y2gcoder.auth.auth.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.y2gcoder.auth.auth.AuthIntegrationTestSupport;
 import com.y2gcoder.auth.auth.domain.AuthorizationCode;
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeProvider;
 import com.y2gcoder.auth.auth.infra.AuthorizationCodeJpaRepository;
@@ -14,10 +15,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class IssueAuthorizationCodeServiceTest {
+class IssueAuthorizationCodeServiceTest extends AuthIntegrationTestSupport {
 
     @Autowired
     private UserJpaRepository userJpaRepository;

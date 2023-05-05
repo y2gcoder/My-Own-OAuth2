@@ -2,6 +2,7 @@ package com.y2gcoder.auth.auth.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.y2gcoder.auth.auth.AuthIntegrationTestSupport;
 import com.y2gcoder.auth.auth.application.AuthorizationCodeRepository;
 import com.y2gcoder.auth.auth.domain.AuthorizationCode;
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeId;
@@ -15,10 +16,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class AuthorizationCodeRepositoryTest {
+
+class AuthorizationCodeRepositoryTest extends AuthIntegrationTestSupport {
 
     @Autowired
     private AuthorizationCodeJpaRepository authorizationCodeJpaRepository;
@@ -75,7 +75,7 @@ class AuthorizationCodeRepositoryTest {
         // given
         String targetCode = "code";
         LocalDateTime expirationTime = LocalDateTime.of(2023, 5, 4, 14, 25);
-        AuthorizationCodeJpaEntity authorizationCodeJpaEntity = authorizationCodeJpaRepository.save(
+        authorizationCodeJpaRepository.save(
                 new AuthorizationCodeJpaEntity(
                         "id",
                         targetCode,

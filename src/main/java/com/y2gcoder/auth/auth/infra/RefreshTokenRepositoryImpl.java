@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -15,6 +16,7 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
 
     private final RefreshTokenJpaRepository refreshTokenJpaRepository;
 
+    @Transactional
     @Override
     public RefreshToken save(RefreshToken refreshToken) {
         RefreshTokenJpaEntity refreshTokenJpaEntity = RefreshTokenJpaEntity.fromDomain(
@@ -27,6 +29,7 @@ public class RefreshTokenRepositoryImpl implements RefreshTokenRepository {
         return RefreshTokenId.of(UUID.randomUUID().toString());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<RefreshToken> findLatestRefreshTokenByOwnerId(UserId ownerId) {
         return refreshTokenJpaRepository.findFirstByOwnerIdOrderByIssuedAtDesc(ownerId.getValue())

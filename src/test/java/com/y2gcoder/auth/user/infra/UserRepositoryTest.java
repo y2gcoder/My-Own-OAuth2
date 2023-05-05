@@ -2,6 +2,7 @@ package com.y2gcoder.auth.user.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.y2gcoder.auth.user.UserIntegrationTestSupport;
 import com.y2gcoder.auth.user.application.UserRepository;
 import com.y2gcoder.auth.user.domain.User;
 import com.y2gcoder.auth.user.domain.UserId;
@@ -12,10 +13,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class UserRepositoryTest {
+class UserRepositoryTest extends UserIntegrationTestSupport {
 
     @Autowired
     private UserJpaRepository userJpaRepository;
@@ -57,7 +56,7 @@ class UserRepositoryTest {
         );
 
         // when
-        User result = sut.save(user);
+        sut.save(user);
 
         // then
         Optional<UserJpaEntity> optionalEntity = userJpaRepository.findById("id");

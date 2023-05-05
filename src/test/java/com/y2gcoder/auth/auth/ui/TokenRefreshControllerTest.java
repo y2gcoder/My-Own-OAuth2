@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.y2gcoder.auth.auth.AuthWebMvcTestSupport;
 import com.y2gcoder.auth.auth.application.AccessTokenDto;
 import com.y2gcoder.auth.auth.application.ExpiredRefreshTokenException;
 import com.y2gcoder.auth.auth.application.InvalidAccessTokenException;
@@ -16,28 +16,13 @@ import com.y2gcoder.auth.auth.application.NotFoundRefreshTokenException;
 import com.y2gcoder.auth.auth.application.RefreshTokenDto;
 import com.y2gcoder.auth.auth.application.RefreshTokenMismatchException;
 import com.y2gcoder.auth.auth.application.TokenRefreshDto;
-import com.y2gcoder.auth.auth.application.TokenRefreshService;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(controllers = TokenRefreshController.class)
-class TokenRefreshControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private TokenRefreshService tokenRefreshService;
+class TokenRefreshControllerTest extends AuthWebMvcTestSupport {
 
     @DisplayName("액세스 토큰과 리프레시 토큰으로 액세스 토큰을 재발급한다.")
     @Test

@@ -2,6 +2,7 @@ package com.y2gcoder.auth.auth.infra;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.y2gcoder.auth.auth.AuthIntegrationTestSupport;
 import com.y2gcoder.auth.auth.application.RefreshTokenRepository;
 import com.y2gcoder.auth.auth.domain.RefreshToken;
 import com.y2gcoder.auth.auth.domain.RefreshTokenId;
@@ -17,10 +18,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class RefreshTokenRepositoryTest {
+class RefreshTokenRepositoryTest extends AuthIntegrationTestSupport {
 
     @Autowired
     private RefreshTokenJpaRepository refreshTokenJpaRepository;

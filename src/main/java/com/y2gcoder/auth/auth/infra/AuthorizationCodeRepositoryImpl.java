@@ -17,6 +17,7 @@ public class AuthorizationCodeRepositoryImpl implements AuthorizationCodeReposit
 
     private final AuthorizationCodeJpaRepository authorizationCodeJpaRepository;
 
+    @Transactional
     @Override
     public AuthorizationCode save(AuthorizationCode authorizationCode) {
         AuthorizationCodeJpaEntity authorizationCodeJpaEntity = AuthorizationCodeJpaEntity
@@ -29,6 +30,7 @@ public class AuthorizationCodeRepositoryImpl implements AuthorizationCodeReposit
         return AuthorizationCodeId.of(UUID.randomUUID().toString());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<AuthorizationCode> findByCode(String code) {
         return authorizationCodeJpaRepository.findByCode(code)

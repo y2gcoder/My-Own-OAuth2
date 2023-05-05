@@ -8,34 +8,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.y2gcoder.auth.auth.AuthWebMvcTestSupport;
 import com.y2gcoder.auth.auth.application.AccessTokenDto;
 import com.y2gcoder.auth.auth.application.NotFoundAuthorizationCodeException;
 import com.y2gcoder.auth.auth.application.RefreshTokenDto;
 import com.y2gcoder.auth.auth.application.SignInDto;
-import com.y2gcoder.auth.auth.application.SignInService;
 import com.y2gcoder.auth.auth.application.UnavailableAuthorizationCodeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
-@WebMvcTest(controllers = SignInController.class)
-class SignInControllerTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @MockBean
-    private SignInService signInService;
+class SignInControllerTest extends AuthWebMvcTestSupport {
 
     @DisplayName("인증 코드로 액세스 토큰과 리프레시 토큰을 발급한다.")
     @Test

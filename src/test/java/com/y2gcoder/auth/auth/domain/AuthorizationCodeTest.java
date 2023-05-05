@@ -14,17 +14,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AuthorizationCodeTest {
 
-    private static Stream<Arguments> provideExpirationTimesForIsExpired() {
+    private static Stream<Arguments> provideReferenceTimeAndExpirationTimeForIsExpiredAt() {
         return Stream.of(
-                Arguments.of(LocalDateTime.now().plusDays(1), false),
-                Arguments.of(LocalDateTime.now().minusMinutes(1), true)
+                Arguments.of(
+                        LocalDateTime.of(2023, 5, 5, 22, 41, 0),
+                        LocalDateTime.of(2023, 5, 5, 22, 41, 1),
+                        false
+                ),
+                Arguments.of(
+                        LocalDateTime.of(2023, 5, 5, 22, 41, 1),
+                        LocalDateTime.of(2023, 5, 5, 22, 41, 0),
+                        true
+                )
         );
     }
 
     @DisplayName("인증 코드가 만료되었는지 확인한다.")
-    @MethodSource("provideExpirationTimesForIsExpired")
+    @MethodSource("provideReferenceTimeAndExpirationTimeForIsExpiredAt")
     @ParameterizedTest
-    void isExpired(LocalDateTime expirationTime, boolean expected) {
+    void isExpired(LocalDateTime referenceTime, LocalDateTime expirationTime, boolean expected) {
         // given
         AuthorizationCode authorizationCode = new AuthorizationCode(
                 AuthorizationCodeId.of("authcodeid"),
@@ -35,7 +43,7 @@ class AuthorizationCodeTest {
         );
 
         // when
-        boolean result = authorizationCode.isExpired();
+        boolean result = authorizationCode.isExpiredAt(referenceTime);
 
         // then
         assertThat(result).isEqualTo(expected);
@@ -96,7 +104,8 @@ class AuthorizationCodeTest {
     @Test
     void isAvailable() {
         // given
-        LocalDateTime expirationTime = LocalDateTime.now().plusDays(1);
+        LocalDateTime expirationTime = LocalDateTime
+                .of(2023, 5, 5, 23, 50, 1);
         AuthorizationCode authorizationCode = new AuthorizationCode(
                 AuthorizationCodeId.of("authcodeid"),
                 "authorizationcode",
@@ -105,15 +114,18 @@ class AuthorizationCodeTest {
                 UserId.of("userid")
         );
 
-        // when // then
-        assertThat(authorizationCode.isAvailable()).isTrue();
+        // expected
+        LocalDateTime referenceTime = LocalDateTime
+                .of(2023, 5, 5, 23, 50, 0);
+        assertThat(authorizationCode.isAvailable(referenceTime)).isTrue();
     }
 
     @DisplayName("만료된 인증 코드는 사용할 수 없다.")
     @Test
     void isAvailableWithExpired() {
         // given
-        LocalDateTime expirationTime = LocalDateTime.now().minusDays(1);
+        LocalDateTime expirationTime = LocalDateTime
+                .of(2023, 5, 5, 23, 50, 1);
         AuthorizationCode authorizationCode = new AuthorizationCode(
                 AuthorizationCodeId.of("authcodeid"),
                 "authorizationcode",
@@ -122,15 +134,18 @@ class AuthorizationCodeTest {
                 UserId.of("userid")
         );
 
-        // when // then
-        assertThat(authorizationCode.isAvailable()).isFalse();
+        // expected
+        LocalDateTime referenceTime = LocalDateTime
+                .of(2023, 5, 5, 23, 50, 2);
+        assertThat(authorizationCode.isAvailable(referenceTime)).isFalse();
     }
 
     @DisplayName("이미 사용한 인증코드는 사용할 수 없다.")
     @Test
     void isAvailableWithUsed() {
         // given
-        LocalDateTime expirationTime = LocalDateTime.now().plusDays(1);
+        LocalDateTime expirationTime = LocalDateTime
+                .of(2023, 5, 5, 23, 50, 1);
         AuthorizationCode authorizationCode = new AuthorizationCode(
                 AuthorizationCodeId.of("authcodeid"),
                 "authorizationcode",
@@ -139,8 +154,10 @@ class AuthorizationCodeTest {
                 UserId.of("userid")
         );
 
-        // when // then
-        assertThat(authorizationCode.isAvailable()).isFalse();
+        // expected
+        LocalDateTime referenceTime = LocalDateTime
+                .of(2023, 5, 5, 23, 50, 0);
+        assertThat(authorizationCode.isAvailable(referenceTime)).isFalse();
 
     }
 

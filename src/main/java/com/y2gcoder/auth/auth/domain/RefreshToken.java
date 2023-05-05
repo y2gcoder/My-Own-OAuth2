@@ -44,8 +44,8 @@ public class RefreshToken {
         return issuedAt;
     }
 
-    public boolean isExpired() {
-        return LocalDateTime.now().isAfter(expirationTime);
+    public boolean isExpiredAt(LocalDateTime referenceTime) {
+        return referenceTime.isAfter(expirationTime);
     }
 
     @Override

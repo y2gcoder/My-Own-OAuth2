@@ -3,7 +3,6 @@ package com.y2gcoder.auth.auth.infra;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeProvider;
-import com.y2gcoder.auth.common.infra.StubTime;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -19,11 +18,7 @@ class BasicAuthorizationCodeProviderTest {
     @Test
     void generateCode() {
         // given
-        LocalDateTime fixedLocalDateTime = LocalDateTime
-                .of(2023, 5, 4, 13, 19);
-
-        sut = new BasicAuthorizationCodeProvider(new StubTime(fixedLocalDateTime),
-                Duration.ofMinutes(5));
+        sut = new BasicAuthorizationCodeProvider(Duration.ofMinutes(5));
         Set<String> codes = new HashSet<>();
 
         // when
@@ -39,15 +34,14 @@ class BasicAuthorizationCodeProviderTest {
     @Test
     void getExpirationTime() {
         // given
+        Duration expiration = Duration.ofMinutes(5);
+        sut = new BasicAuthorizationCodeProvider(expiration);
+
         LocalDateTime fixedLocalDateTime = LocalDateTime
                 .of(2023, 5, 4, 13, 19);
 
-        Duration expiration = Duration.ofMinutes(5);
-        sut = new BasicAuthorizationCodeProvider(new StubTime(fixedLocalDateTime),
-                expiration);
-
         // when
-        LocalDateTime result = sut.getExpirationTime();
+        LocalDateTime result = sut.getExpirationTime(fixedLocalDateTime);
 
         // then
         assertThat(result).isEqualTo(fixedLocalDateTime.plus(expiration));

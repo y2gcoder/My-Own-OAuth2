@@ -3,10 +3,12 @@ package com.y2gcoder.auth.auth.application;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.y2gcoder.auth.auth.domain.AuthorizationCode;
+import com.y2gcoder.auth.auth.domain.AuthorizationCodeProvider;
 import com.y2gcoder.auth.auth.infra.AuthorizationCodeJpaRepository;
 import com.y2gcoder.auth.user.domain.UserId;
 import com.y2gcoder.auth.user.infra.UserJpaEntity;
 import com.y2gcoder.auth.user.infra.UserJpaRepository;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -22,6 +24,9 @@ class IssueAuthorizationCodeServiceTest {
 
     @Autowired
     private AuthorizationCodeJpaRepository authorizationCodeJpaRepository;
+
+    @Autowired
+    private AuthorizationCodeProvider authorizationCodeProvider;
 
     @Autowired
     private IssueAuthorizationCodeService sut;
@@ -47,12 +52,16 @@ class IssueAuthorizationCodeServiceTest {
     @Test
     void issueAuthorizationCode() {
         // when
+        LocalDateTime currentTime = LocalDateTime
+                .of(2023, 5, 5, 23, 2, 0);
         AuthorizationCode result = sut
-                .issueAuthorizationCode("test@test.com", "test1234");
+                .issueAuthorizationCode("test@test.com", "test1234", currentTime);
 
         // then
+        LocalDateTime referenceTime = authorizationCodeProvider.getExpirationTime(currentTime)
+                .minusNanos(1);
         assertThat(result).isNotNull();
-        assertThat(result.isAvailable()).isTrue();
+        assertThat(result.isAvailable(referenceTime)).isTrue();
         assertThat(result.getCode()).isNotNull();
         assertThat(result.getOwnerId()).isEqualTo(UserId.of("userId"));
     }

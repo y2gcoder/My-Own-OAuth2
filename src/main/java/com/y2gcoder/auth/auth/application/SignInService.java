@@ -22,7 +22,7 @@ public class SignInService {
     private final RefreshTokenProvider refreshTokenProvider;
 
     public SignInDto signIn(String code, LocalDateTime currentTime) {
-        UserId ownerId = getOwnerIdBy(code);
+        UserId ownerId = getOwnerIdBy(code, currentTime);
 
         String accessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
 
@@ -31,17 +31,17 @@ public class SignInService {
         return createSignInDto(accessToken, refreshToken);
     }
 
-    private UserId getOwnerIdBy(String code) {
-        AuthorizationCode authorizationCode = getAuthorizationCodeBy(code);
+    private UserId getOwnerIdBy(String code, LocalDateTime currentTime) {
+        AuthorizationCode authorizationCode = getAuthorizationCodeBy(code, currentTime);
         UserId ownerId = authorizationCode.getOwnerId();
         markAuthorizationCodeAsUsed(authorizationCode);
         return ownerId;
     }
 
-    private AuthorizationCode getAuthorizationCodeBy(String code) {
+    private AuthorizationCode getAuthorizationCodeBy(String code, LocalDateTime currentTime) {
         AuthorizationCode authorizationCode = authorizationCodeRepository.findByCode(code)
                 .orElseThrow(NotFoundAuthorizationCodeException::new);
-        if (!authorizationCode.isAvailable()) {
+        if (!authorizationCode.isAvailable(currentTime)) {
             throw new UnavailableAuthorizationCodeException();
         }
         return authorizationCode;

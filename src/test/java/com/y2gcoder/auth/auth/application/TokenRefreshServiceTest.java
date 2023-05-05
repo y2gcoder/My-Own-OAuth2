@@ -168,10 +168,9 @@ class TokenRefreshServiceTest {
     @Test
     void tokenRefreshWithExpiredRefreshToken() {
         // given
-        // given
         UserId ownerId = UserId.of("ownerId");
-        LocalDateTime currentTime = LocalDateTime.now();
-        String oldAccessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
+        LocalDateTime issuedAt = LocalDateTime.of(2023, 5, 5, 22, 30, 0);
+        String oldAccessToken = jwtTokenProvider.generateToken(ownerId.getValue(), issuedAt);
 
         RefreshTokenId refreshTokenId = RefreshTokenId.of("refreshtokenid");
         RefreshTokenJpaEntity refreshToken = refreshTokenJpaRepository.save(
@@ -179,11 +178,12 @@ class TokenRefreshServiceTest {
                         refreshTokenId.getValue(),
                         "token",
                         ownerId.getValue(),
-                        currentTime,
-                        currentTime
+                        issuedAt,
+                        issuedAt
                 ));
 
         // expected
+        LocalDateTime currentTime = LocalDateTime.of(2023, 5, 5, 22, 30, 1);
         assertThatThrownBy(() -> sut.tokenRefresh(oldAccessToken, refreshToken.getToken(),
                 currentTime))
                 .isInstanceOf(ExpiredRefreshTokenException.class)

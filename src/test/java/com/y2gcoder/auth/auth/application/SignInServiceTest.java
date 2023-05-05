@@ -48,7 +48,9 @@ class SignInServiceTest {
         // given
         AuthorizationCodeId authorizationCodeId = AuthorizationCodeId.of("authorizationCodeId");
         String code = "code";
-        LocalDateTime expirationTime = LocalDateTime.now().plusMonths(1);
+        LocalDateTime currentTime = LocalDateTime
+                .of(2023, 5, 5, 23, 36, 0);
+        LocalDateTime expirationTime = currentTime.plusMonths(1);
         UserId ownerId = UserId.of("userId");
         authorizationCodeJpaRepository.save(new AuthorizationCodeJpaEntity(
                 authorizationCodeId.getValue(),
@@ -59,13 +61,12 @@ class SignInServiceTest {
         ));
 
         // when
-        SignInDto result = sut.signIn(code, LocalDateTime.now());
+        SignInDto result = sut.signIn(code, currentTime);
 
         // then
         assertThat(result).isNotNull();
 
         String accessToken = result.getAccess().getToken();
-        jwtTokenProvider.validateToken(accessToken);
         String username = jwtTokenProvider.getUsernameFrom(accessToken);
         assertThat(username).isEqualTo(ownerId.getValue());
         assertThat(result.getAccess().getExpirationTime()).isEqualTo(
@@ -92,9 +93,10 @@ class SignInServiceTest {
     void signInWithNotFoundAuthorizationCode() {
         // given
         String code = "code";
+        LocalDateTime currentTime = LocalDateTime.of(2023, 5, 5, 23, 22, 0);
 
         // expected
-        assertThatThrownBy(() -> sut.signIn(code, LocalDateTime.now()))
+        assertThatThrownBy(() -> sut.signIn(code, currentTime))
                 .isInstanceOf(NotFoundAuthorizationCodeException.class)
                 .hasMessage("인증 코드를 찾을 수 없습니다.");
     }
@@ -105,7 +107,8 @@ class SignInServiceTest {
         // given
         AuthorizationCodeId authorizationCodeId = AuthorizationCodeId.of("authorizationCodeId");
         String code = "code";
-        LocalDateTime expirationTime = LocalDateTime.now().minusSeconds(1);
+        LocalDateTime currentTime = LocalDateTime.of(2023, 5, 5, 23, 22, 0);
+        LocalDateTime expirationTime = currentTime.minusSeconds(1);
         UserId ownerId = UserId.of("userId");
         authorizationCodeJpaRepository.save(new AuthorizationCodeJpaEntity(
                 authorizationCodeId.getValue(),
@@ -116,7 +119,7 @@ class SignInServiceTest {
         ));
 
         // expected
-        assertThatThrownBy(() -> sut.signIn(code, LocalDateTime.now()))
+        assertThatThrownBy(() -> sut.signIn(code, currentTime))
                 .isInstanceOf(UnavailableAuthorizationCodeException.class)
                 .hasMessage("사용할 수 없는 인증코드입니다.");
     }
@@ -127,7 +130,9 @@ class SignInServiceTest {
         // given
         AuthorizationCodeId authorizationCodeId = AuthorizationCodeId.of("authorizationCodeId");
         String code = "code";
-        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(1);
+        LocalDateTime currentTime = LocalDateTime
+                .of(2023, 5, 5, 23, 36, 0);
+        LocalDateTime expirationTime = currentTime.plusMinutes(1);
         UserId ownerId = UserId.of("userId");
         authorizationCodeJpaRepository.save(new AuthorizationCodeJpaEntity(
                 authorizationCodeId.getValue(),
@@ -138,7 +143,7 @@ class SignInServiceTest {
         ));
 
         // expected
-        assertThatThrownBy(() -> sut.signIn(code, LocalDateTime.now()))
+        assertThatThrownBy(() -> sut.signIn(code, currentTime))
                 .isInstanceOf(UnavailableAuthorizationCodeException.class)
                 .hasMessage("사용할 수 없는 인증코드입니다.");
     }

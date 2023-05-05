@@ -201,7 +201,7 @@ class JwtTokenProviderTest {
         assertThat(result).isEqualToIgnoringNanos(issuedDateTime.plusSeconds(60));
     }
 
-    @DisplayName("만료된 토큰에서 만료시간을 가져올 수 없다.")
+    @DisplayName("만료된 토큰에서 만료시간을 가져올 수 있다.")
     @Test
     void getExpirationWithExpired() {
         //given
@@ -214,9 +214,9 @@ class JwtTokenProviderTest {
         LocalDateTime issuedAt = LocalDateTime.now();
         String token = sut.generateToken(username, issuedAt);
 
-        //expected
-        assertThatThrownBy(() -> sut.getExpiration(token))
-                .isInstanceOf(ExpiredJwtException.class);
+        //when
+        LocalDateTime expirationTime = sut.getExpiration(token);
+        assertThat(expirationTime).isEqualToIgnoringNanos(issuedAt);
     }
 
     @DisplayName("잘못된 토큰에서 만료시간을 가져올 수 없다.")

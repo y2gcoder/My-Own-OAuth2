@@ -1,5 +1,7 @@
 package com.y2gcoder.auth.auth.ui;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -48,7 +50,8 @@ class IssueAuthorizationCodeControllerTest {
                 .build();
 
         LocalDateTime expirationTime = LocalDateTime.of(2023, 5, 4, 9, 43);
-        given(issueAuthorizationCodeService.issueAuthorizationCode(email, password))
+        given(issueAuthorizationCodeService.issueAuthorizationCode(eq(email), eq(password),
+                any(LocalDateTime.class)))
                 .willReturn(new AuthorizationCode(
                         AuthorizationCodeId.of("authorizationCodeId"),
                         "code",
@@ -145,7 +148,8 @@ class IssueAuthorizationCodeControllerTest {
                 .password(password)
                 .build();
 
-        given(issueAuthorizationCodeService.issueAuthorizationCode(email, password))
+        given(issueAuthorizationCodeService.issueAuthorizationCode(eq(email), eq(password),
+                any(LocalDateTime.class)))
                 .willThrow(new NotFoundOwnerException());
 
         // expected
@@ -169,7 +173,8 @@ class IssueAuthorizationCodeControllerTest {
                 .password(password)
                 .build();
 
-        given(issueAuthorizationCodeService.issueAuthorizationCode(email, password))
+        given(issueAuthorizationCodeService.issueAuthorizationCode(eq(email), eq(password),
+                any(LocalDateTime.class)))
                 .willThrow(new InvalidPasswordException());
 
         // expected

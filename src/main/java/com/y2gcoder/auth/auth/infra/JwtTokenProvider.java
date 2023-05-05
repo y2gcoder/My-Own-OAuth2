@@ -66,8 +66,16 @@ public class JwtTokenProvider {
     }
 
     public LocalDateTime getExpiration(String token) {
-        validateToken(token);
-        Date tokenExpirationDate = getClaims(token).getBody().getExpiration();
+        Jws<Claims> claims;
+        try {
+            claims = getClaims(token);
+        } catch (ExpiredJwtException e) {
+            log.info("Jwt Token is Expired");
+            return e.getClaims().getExpiration().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime();
+        }
+        Date tokenExpirationDate = claims.getBody().getExpiration();
         return tokenExpirationDate.toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();

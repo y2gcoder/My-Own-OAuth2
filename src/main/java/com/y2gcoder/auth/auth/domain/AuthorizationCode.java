@@ -45,8 +45,8 @@ public class AuthorizationCode {
         return ownerId;
     }
 
-    public boolean isExpired() {
-        return LocalDateTime.now().isAfter(expirationTime);
+    public boolean isExpiredAt(LocalDateTime referenceTime) {
+        return referenceTime.isAfter(expirationTime);
     }
 
     public boolean isUsed() {
@@ -57,8 +57,8 @@ public class AuthorizationCode {
         status = AuthorizationCodeStatus.USED;
     }
 
-    public boolean isAvailable() {
-        return !isUsed() && !isExpired();
+    public boolean isAvailable(LocalDateTime referenceTime) {
+        return !isUsed() && !isExpiredAt(referenceTime);
     }
 
     @Override

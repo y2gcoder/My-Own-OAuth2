@@ -19,7 +19,7 @@ public class TokenRefreshService {
         UserId ownerId = getOwnerIdBy(oldAccessToken);
 
         RefreshToken refreshToken = getRefreshTokenBy(ownerId);
-        validateRefreshToken(inputRefreshToken, refreshToken);
+        validateRefreshToken(inputRefreshToken, refreshToken, currentTime);
 
         String accessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
 
@@ -42,11 +42,13 @@ public class TokenRefreshService {
                 .orElseThrow(NotFoundRefreshTokenException::new);
     }
 
-    private void validateRefreshToken(String inputRefreshToken, RefreshToken refreshToken) {
+    private void validateRefreshToken(String inputRefreshToken,
+            RefreshToken refreshToken,
+            LocalDateTime currentTime) {
         if (areRefreshTokensMatching(inputRefreshToken, refreshToken)) {
             throw new RefreshTokenMismatchException();
         }
-        if (refreshToken.isExpired()) {
+        if (refreshToken.isExpiredAt(currentTime)) {
             throw new ExpiredRefreshTokenException();
         }
     }

@@ -31,7 +31,7 @@ public class TokenRefreshService {
             String username = jwtTokenProvider.getUsernameFrom(oldAccessToken);
             return UserId.of(username);
         } catch (Exception e) {
-            throw new InvalidAccessTokenException("유효하지 않은 액세스 토큰입니다.", e);
+            throw new InvalidAccessTokenException(e);
         }
 
     }

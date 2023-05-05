@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserWithEmailExistsException.class)
     public ErrorResponse userWithEmailExistsException(UserWithEmailExistsException e) {
         return ErrorResponse.builder()
-                .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .code(String.valueOf(HttpStatus.CONFLICT.value()))
                 .message(e.getMessage())
                 .build();
     }

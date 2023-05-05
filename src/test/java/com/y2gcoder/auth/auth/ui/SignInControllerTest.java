@@ -10,9 +10,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.y2gcoder.auth.auth.application.AccessTokenDto;
+import com.y2gcoder.auth.auth.application.NotFoundAuthorizationCodeException;
 import com.y2gcoder.auth.auth.application.RefreshTokenDto;
 import com.y2gcoder.auth.auth.application.SignInDto;
 import com.y2gcoder.auth.auth.application.SignInService;
+import com.y2gcoder.auth.auth.application.UnavailableAuthorizationCodeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.DisplayName;
@@ -92,5 +94,49 @@ class SignInControllerTest {
                 .andExpect(jsonPath("$.code").value("400"))
                 .andExpect(jsonPath("$.message")
                         .value("인증 코드는 필수값입니다."));
+    }
+
+    @DisplayName("인증코드가 저장되어있지 않으면 토큰을 발급할 수 없다.")
+    @Test
+    void signInWithNotFoundAuthorizationCode() throws Exception {
+        // given
+        SignInRequest request = SignInRequest.builder()
+                .code("code")
+                .build();
+
+        given(signInService.signIn(anyString(), any(LocalDateTime.class)))
+                .willThrow(new NotFoundAuthorizationCodeException());
+
+        // expected
+        mockMvc.perform(post("/auth/token")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("401"))
+                .andExpect(jsonPath("$.message")
+                        .value("인증 코드를 찾을 수 없습니다."));
+    }
+
+    @DisplayName("인증코드를 사용할 수 없다면 토큰을 발급할 수 없다.")
+    @Test
+    void signInWithUnavailableAuthorizationCode() throws Exception {
+        // given
+        SignInRequest request = SignInRequest.builder()
+                .code("code")
+                .build();
+
+        given(signInService.signIn(anyString(), any(LocalDateTime.class)))
+                .willThrow(new UnavailableAuthorizationCodeException());
+
+        // expected
+        mockMvc.perform(post("/auth/token")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("401"))
+                .andExpect(jsonPath("$.message")
+                        .value("사용할 수 없는 인증코드입니다."));
     }
 }

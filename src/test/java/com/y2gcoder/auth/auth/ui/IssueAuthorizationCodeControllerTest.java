@@ -11,6 +11,8 @@ import com.y2gcoder.auth.auth.application.IssueAuthorizationCodeService;
 import com.y2gcoder.auth.auth.domain.AuthorizationCode;
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeId;
 import com.y2gcoder.auth.auth.domain.AuthorizationCodeStatus;
+import com.y2gcoder.auth.auth.infra.InvalidPasswordException;
+import com.y2gcoder.auth.auth.infra.NotFoundOwnerException;
 import com.y2gcoder.auth.user.domain.UserId;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -130,5 +132,53 @@ class IssueAuthorizationCodeControllerTest {
                 .andExpect(jsonPath("$.message")
                         .value("비밀번호는 필수값입니다."));
 
+    }
+
+    @DisplayName("회원가입되지 않은 이메일로 인증코드를 발급할 수 없다.")
+    @Test
+    void issueAuthorizationCodeWithNotRegisteredEmail() throws Exception {
+        // given
+        String email = "test@test.com";
+        String password = "password";
+        IssueAuthorizationCodeRequest request = IssueAuthorizationCodeRequest.builder()
+                .email(email)
+                .password(password)
+                .build();
+
+        given(issueAuthorizationCodeService.issueAuthorizationCode(email, password))
+                .willThrow(new NotFoundOwnerException());
+
+        // expected
+        mockMvc.perform(post("/auth/code")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("404"))
+                .andExpect(jsonPath("$.message").value("해당하는 소유자를 찾지 못했습니다."));
+    }
+
+    @DisplayName("입력한 비밀번호와 저장된 비밀번호가 일치하지 않을 때, 인증코드를 발급할 수 없다.")
+    @Test
+    void issueAuthorizationCodeWhenMismatchPassword() throws Exception {
+        // given
+        String email = "test@test.com";
+        String password = "password";
+        IssueAuthorizationCodeRequest request = IssueAuthorizationCodeRequest.builder()
+                .email(email)
+                .password(password)
+                .build();
+
+        given(issueAuthorizationCodeService.issueAuthorizationCode(email, password))
+                .willThrow(new InvalidPasswordException());
+
+        // expected
+        mockMvc.perform(post("/auth/code")
+                        .content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("401"))
+                .andExpect(jsonPath("$.message").value("비밀번호가 일치하지 않습니다."));
     }
 }

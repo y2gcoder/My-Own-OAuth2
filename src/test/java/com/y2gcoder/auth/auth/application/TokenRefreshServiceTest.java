@@ -2,23 +2,26 @@ package com.y2gcoder.auth.auth.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 
 import com.y2gcoder.auth.auth.domain.RefreshTokenId;
 import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
 import com.y2gcoder.auth.auth.infra.RefreshTokenJpaEntity;
 import com.y2gcoder.auth.auth.infra.RefreshTokenJpaRepository;
 import com.y2gcoder.auth.user.domain.UserId;
+import io.jsonwebtoken.MalformedJwtException;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @SpringBootTest
 class TokenRefreshServiceTest {
 
-    @Autowired
+    @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
@@ -37,8 +40,9 @@ class TokenRefreshServiceTest {
     void tokenRefresh() {
         // given
         UserId ownerId = UserId.of("ownerId");
-        LocalDateTime currentTime = LocalDateTime.now();
-        String oldAccessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
+        LocalDateTime currentTime = LocalDateTime
+                .of(2023, 5, 5, 23, 59, 59);
+        String oldAccessToken = "oldAccess";
 
         RefreshTokenId refreshTokenId = RefreshTokenId.of("refreshtokenid");
         RefreshTokenJpaEntity refreshToken = refreshTokenJpaRepository.save(
@@ -49,6 +53,14 @@ class TokenRefreshServiceTest {
                         currentTime.plusMinutes(30),
                         currentTime
                 ));
+
+        given(jwtTokenProvider.getUsernameFrom(oldAccessToken))
+                .willReturn("ownerId");
+        given(jwtTokenProvider.generateToken("ownerId", currentTime))
+                .willReturn("newAccess");
+        LocalDateTime accessTokenExpirationTime = currentTime.plusMinutes(5);
+        given(jwtTokenProvider.getExpiration("newAccess"))
+                .willReturn(accessTokenExpirationTime);
 
         // when
         TokenRefreshDto result = sut.tokenRefresh(oldAccessToken, refreshToken.getToken(),
@@ -69,9 +81,9 @@ class TokenRefreshServiceTest {
     void tokenRefreshWithExpiredAccessToken() {
         // given
         UserId ownerId = UserId.of("ownerId");
-        LocalDateTime currentTime = LocalDateTime.now();
-        LocalDateTime expiredTime = currentTime.minusYears(1);
-        String oldAccessToken = jwtTokenProvider.generateToken(ownerId.getValue(), expiredTime);
+        LocalDateTime currentTime = LocalDateTime
+                .of(2023, 5, 5, 23, 59, 59);
+        String oldAccessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
 
         RefreshTokenId refreshTokenId = RefreshTokenId.of("refreshtokenid");
         RefreshTokenJpaEntity refreshToken = refreshTokenJpaRepository.save(
@@ -82,6 +94,14 @@ class TokenRefreshServiceTest {
                         currentTime.plusMinutes(30),
                         currentTime
                 ));
+
+        given(jwtTokenProvider.getUsernameFrom(oldAccessToken))
+                .willReturn("ownerId");
+        given(jwtTokenProvider.generateToken("ownerId", currentTime))
+                .willReturn("newAccess");
+        LocalDateTime accessTokenExpirationTime = currentTime.plusMinutes(5);
+        given(jwtTokenProvider.getExpiration("newAccess"))
+                .willReturn(accessTokenExpirationTime);
 
         // when
         TokenRefreshDto result = sut.tokenRefresh(oldAccessToken, refreshToken.getToken(),
@@ -102,7 +122,8 @@ class TokenRefreshServiceTest {
     void tokenRefreshWithInvalidAccessToken() {
         // given
         UserId ownerId = UserId.of("ownerId");
-        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime currentTime = LocalDateTime
+                .of(2023, 5, 5, 23, 59, 59);
         String oldAccessToken = "invalid";
 
         RefreshTokenId refreshTokenId = RefreshTokenId.of("refreshtokenid");
@@ -114,6 +135,9 @@ class TokenRefreshServiceTest {
                         currentTime.plusMinutes(30),
                         currentTime
                 ));
+
+        given(jwtTokenProvider.getUsernameFrom(oldAccessToken))
+                .willThrow(new InvalidAccessTokenException(new MalformedJwtException("test")));
 
         // expected
         assertThatThrownBy(() -> sut.tokenRefresh(oldAccessToken, refreshToken.getToken(),
@@ -127,8 +151,12 @@ class TokenRefreshServiceTest {
     void tokenRefreshWithNotFoundRefreshToken() {
         // given
         UserId ownerId = UserId.of("ownerId");
-        LocalDateTime currentTime = LocalDateTime.now();
-        String oldAccessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
+        LocalDateTime currentTime = LocalDateTime
+                .of(2023, 5, 5, 23, 59, 59);
+        String oldAccessToken = "oldAccess";
+
+        given(jwtTokenProvider.getUsernameFrom(oldAccessToken))
+                .willReturn(ownerId.getValue());
 
         // expected
         assertThatThrownBy(() -> sut.tokenRefresh(oldAccessToken, "refresh",
@@ -143,11 +171,12 @@ class TokenRefreshServiceTest {
     void tokenRefreshWhenInputRefreshTokenIsNotEqualToFoundRefreshToken() {
         // given
         UserId ownerId = UserId.of("ownerId");
-        LocalDateTime currentTime = LocalDateTime.now();
-        String oldAccessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
+        LocalDateTime currentTime = LocalDateTime
+                .of(2023, 5, 5, 23, 59, 59);
+        String oldAccessToken = "oldAccess";
 
         RefreshTokenId refreshTokenId = RefreshTokenId.of("refreshtokenid");
-        RefreshTokenJpaEntity refreshToken = refreshTokenJpaRepository.save(
+        refreshTokenJpaRepository.save(
                 new RefreshTokenJpaEntity(
                         refreshTokenId.getValue(),
                         "token",
@@ -155,6 +184,9 @@ class TokenRefreshServiceTest {
                         currentTime.plusMinutes(30),
                         currentTime
                 ));
+
+        given(jwtTokenProvider.getUsernameFrom(oldAccessToken))
+                .willReturn(ownerId.getValue());
 
         // expected
         assertThatThrownBy(() -> sut.tokenRefresh(oldAccessToken, "mismatch",
@@ -181,6 +213,9 @@ class TokenRefreshServiceTest {
                         issuedAt,
                         issuedAt
                 ));
+
+        given(jwtTokenProvider.getUsernameFrom(oldAccessToken))
+                .willReturn(ownerId.getValue());
 
         // expected
         LocalDateTime currentTime = LocalDateTime.of(2023, 5, 5, 22, 30, 1);

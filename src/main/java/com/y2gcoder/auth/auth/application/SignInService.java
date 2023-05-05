@@ -22,26 +22,20 @@ public class SignInService {
     private final RefreshTokenProvider refreshTokenProvider;
 
     public SignInDto signIn(String code, LocalDateTime currentTime) {
-        //인증 코드로 소유자 id를 가져온다.(유효한 인증 코드인지 확인 필요)
-        AuthorizationCode authorizationCode = getAuthorizationCodeBy(code);
-        UserId ownerId = authorizationCode.getOwnerId();
+        UserId ownerId = getOwnerIdBy(code);
 
-        //소유자 id를 사용해서 access token을 만든다.
         String accessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
-        LocalDateTime accessTokenExpirationTime = jwtTokenProvider.getExpiration(accessToken);
 
-        //소유자 id를 사용해서 refresh token을 만든다.
         RefreshToken refreshToken = createRefreshToken(currentTime, ownerId);
 
-        //Authorization Code를 사용 상태로 변경한다.
-        authorizationCodeRepository.update(authorizationCode.getId(),
-                AuthorizationCode::markAsUsed);
+        return createSignInDto(accessToken, refreshToken);
+    }
 
-        //반환한다.
-        AccessTokenDto accessTokenDto = new AccessTokenDto(accessToken, accessTokenExpirationTime);
-        RefreshTokenDto refreshTokenDto = new RefreshTokenDto(refreshToken.getToken(),
-                refreshToken.getExpirationTime());
-        return new SignInDto(accessTokenDto, refreshTokenDto);
+    private UserId getOwnerIdBy(String code) {
+        AuthorizationCode authorizationCode = getAuthorizationCodeBy(code);
+        UserId ownerId = authorizationCode.getOwnerId();
+        markAuthorizationCodeAsUsed(authorizationCode);
+        return ownerId;
     }
 
     private AuthorizationCode getAuthorizationCodeBy(String code) {
@@ -53,13 +47,29 @@ public class SignInService {
         return authorizationCode;
     }
 
+    private void markAuthorizationCodeAsUsed(AuthorizationCode authorizationCode) {
+        authorizationCodeRepository.update(authorizationCode.getId(),
+                AuthorizationCode::markAsUsed);
+    }
+
     private RefreshToken createRefreshToken(LocalDateTime currentTime, UserId ownerId) {
         RefreshTokenId refreshTokenId = refreshTokenRepository.nextRefreshTokenId();
         LocalDateTime refreshTokenExpirationTime = refreshTokenProvider.getExpirationTime(
                 currentTime);
+
         return refreshTokenRepository.save(new RefreshToken(refreshTokenId,
                 refreshTokenProvider.generateToken(),
                 ownerId,
                 refreshTokenExpirationTime, currentTime));
+    }
+
+    private SignInDto createSignInDto(String accessToken, RefreshToken refreshToken) {
+        LocalDateTime accessTokenExpirationTime = jwtTokenProvider.getExpiration(accessToken);
+
+        AccessTokenDto accessTokenDto = new AccessTokenDto(accessToken, accessTokenExpirationTime);
+        RefreshTokenDto refreshTokenDto = new RefreshTokenDto(refreshToken.getToken(),
+                refreshToken.getExpirationTime());
+
+        return new SignInDto(accessTokenDto, refreshTokenDto);
     }
 }

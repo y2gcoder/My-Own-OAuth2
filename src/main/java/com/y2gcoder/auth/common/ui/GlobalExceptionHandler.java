@@ -1,6 +1,10 @@
 package com.y2gcoder.auth.common.ui;
 
+import com.y2gcoder.auth.auth.application.ExpiredRefreshTokenException;
+import com.y2gcoder.auth.auth.application.InvalidAccessTokenException;
 import com.y2gcoder.auth.auth.application.NotFoundAuthorizationCodeException;
+import com.y2gcoder.auth.auth.application.NotFoundRefreshTokenException;
+import com.y2gcoder.auth.auth.application.RefreshTokenMismatchException;
 import com.y2gcoder.auth.auth.application.UnavailableAuthorizationCodeException;
 import com.y2gcoder.auth.auth.infra.InvalidPasswordException;
 import com.y2gcoder.auth.auth.infra.NotFoundOwnerException;
@@ -63,6 +67,48 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnavailableAuthorizationCodeException.class)
     public ErrorResponse unavailableAuthorizationCodeException(
             UnavailableAuthorizationCodeException e) {
+        return ErrorResponse.builder()
+                .code(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
+                .message(e.getMessage())
+                .build();
+    }
+
+    /**
+     * 토큰 재발급
+     */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(InvalidAccessTokenException.class)
+    public ErrorResponse invalidAccessTokenException(
+            InvalidAccessTokenException e) {
+        return ErrorResponse.builder()
+                .code(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundRefreshTokenException.class)
+    public ErrorResponse notFoundRefreshTokenException(NotFoundRefreshTokenException e) {
+        return ErrorResponse.builder()
+                .code(String.valueOf(HttpStatus.NOT_FOUND.value()))
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(RefreshTokenMismatchException.class)
+    public ErrorResponse refreshTokenMismatchException(
+            RefreshTokenMismatchException e) {
+        return ErrorResponse.builder()
+                .code(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(ExpiredRefreshTokenException.class)
+    public ErrorResponse expiredRefreshTokenException(
+            ExpiredRefreshTokenException e) {
         return ErrorResponse.builder()
                 .code(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
                 .message(e.getMessage())

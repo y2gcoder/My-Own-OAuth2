@@ -1,6 +1,7 @@
 package com.y2gcoder.auth.auth.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.y2gcoder.auth.auth.domain.RefreshTokenId;
 import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
@@ -31,13 +32,14 @@ class TokenRefreshServiceTest {
         refreshTokenJpaRepository.deleteAllInBatch();
     }
 
-    @DisplayName("액세스 토큰과 리프레시 토큰으로 액세스 토큰을 재발급한다.")
+    @DisplayName("액세스 토큰과 리프레시 토큰으로 토큰을 재발급한다.")
     @Test
     void tokenRefresh() {
         // given
         UserId ownerId = UserId.of("ownerId");
         LocalDateTime currentTime = LocalDateTime.now();
         String oldAccessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
+
         RefreshTokenId refreshTokenId = RefreshTokenId.of("refreshtokenid");
         RefreshTokenJpaEntity refreshToken = refreshTokenJpaRepository.save(
                 new RefreshTokenJpaEntity(
@@ -95,144 +97,98 @@ class TokenRefreshServiceTest {
         assertThat(accessTokenDto.getToken()).isNotEqualTo(oldAccessToken);
     }
 
-    //    @Test
-//    @DisplayName("액세스 토큰과 리프레시 토큰으로 새로운 액세스 토큰을 발급할 수 있다.")
-//    void givenAccessTokenAndRefreshToken_whenTokenRefresh_thenNewAccessTokenIsReturned() throws InterruptedException {
-//        //given
-//        UserId ownerId = UserId.of("ownerId");
-//
-//        String accessToken = jwtTokenProvider.generateToken(ownerId.getValue());
-//
-//        RefreshTokenId refreshTokenId = refreshTokenRepository.nextRefreshTokenId();
-//        LocalDateTime refreshTokenIssuedAt = LocalDateTime.now();
-//        LocalDateTime refreshTokenExpirationTime = refreshTokenIssuedAt.plusDays(30);
-//        RefreshToken refreshToken = new RefreshToken(
-//                refreshTokenId,
-//                "refreshtoken",
-//                ownerId,
-//                refreshTokenExpirationTime,
-//                refreshTokenIssuedAt
-//        );
-//        refreshTokenRepository.save(refreshToken);
-//
-//        //when
-//        TokenRefreshDto result = sut.tokenRefresh(accessToken, refreshToken.getToken());
-//
-//        //then
-//        Assertions.assertThat(result.getAccess().getToken()).isNotEqualTo(accessToken);
-//    }
-//
-//    @Test
-//    @DisplayName("만료된 액세스 토큰과 리프레시 토큰으로 새로운 액세스 토큰을 발급할 수 있다.")
-//    void givenExpiredAccessTokenAndRefreshToken_whenTokenRefresh_thenNewAccessTokenIsReturned() {
-//        //given
-//        UserId ownerId = UserId.of("ownerId");
-//
-//        Duration zeroExpiration = Duration.ZERO;
-//        JwtTokenProvider expiredJwtTokenProvider = new JwtTokenProvider(secretString, zeroExpiration);
-//        String accessToken = expiredJwtTokenProvider.generateToken(ownerId.getValue());
-//
-//        RefreshTokenId refreshTokenId = refreshTokenRepository.nextRefreshTokenId();
-//        LocalDateTime refreshTokenIssuedAt = LocalDateTime.now();
-//        LocalDateTime refreshTokenExpirationTime = refreshTokenIssuedAt.plusDays(30);
-//        RefreshToken refreshToken = new RefreshToken(
-//                refreshTokenId,
-//                "refreshtoken",
-//                ownerId,
-//                refreshTokenExpirationTime,
-//                refreshTokenIssuedAt
-//        );
-//        refreshTokenRepository.save(refreshToken);
-//
-//        //when
-//        TokenRefreshDto result = sut.tokenRefresh(accessToken, refreshToken.getToken());
-//
-//        //then
-//        Assertions.assertThat(result.getAccess().getToken()).isNotEqualTo(accessToken);
-//
-//    }
-//
-//    @Test
-//    @DisplayName("해당 사용자의 리프레시 토큰을 찾지 못하면 토큰을 재발급할 수 없다.")
-//    void givenNotFoundRefreshTokenByOwnerId_whenTokenRefresh_thenExceptionShouldBeThrown() {
-//        //given
-//        UserId anotherOwnerId = UserId.of("anotherOwnerId");
-//
-//        String accessToken = jwtTokenProvider.generateToken(anotherOwnerId.getValue());
-//
-//        UserId ownerId = UserId.of("ownerId");
-//
-//        RefreshTokenId refreshTokenId = refreshTokenRepository.nextRefreshTokenId();
-//        LocalDateTime refreshTokenIssuedAt = LocalDateTime.now();
-//        LocalDateTime refreshTokenExpirationTime = refreshTokenIssuedAt.plusDays(30);
-//        RefreshToken refreshToken = new RefreshToken(
-//                refreshTokenId,
-//                "refreshtoken",
-//                ownerId,
-//                refreshTokenExpirationTime,
-//                refreshTokenIssuedAt
-//        );
-//        refreshTokenRepository.save(refreshToken);
-//
-//        //expected
-//        assertThatThrownBy(() -> sut.tokenRefresh(accessToken, refreshToken.getToken()))
-//                .isInstanceOf(NotFoundRefreshTokenException.class);
-//    }
-//
-//    @Test
-//    @DisplayName("입력한 리프레시 토큰과 사용자가 최근에 발급한 리프레시 토큰이 일치하지 않으면 토큰을 재발급할 수 없다.")
-//    void givenInputRefreshTokenIsNotEqualToUsersLatestRefreshToken_whenTokenRefresh_thenExceptionShouldBeThrown() {
-//        //given
-//        UserId ownerId = UserId.of("ownerId");
-//
-//        String accessToken = jwtTokenProvider.generateToken(ownerId.getValue());
-//
-//        List<RefreshToken> refreshTokens = new ArrayList<>();
-//        for (int i = 0; i < 3; i++) {
-//            RefreshTokenId refreshTokenId = refreshTokenRepository.nextRefreshTokenId();
-//            LocalDateTime refreshTokenIssuedAt = LocalDateTime.now();
-//            LocalDateTime refreshTokenExpirationTime = refreshTokenIssuedAt.plusDays(30);
-//            RefreshToken refreshToken = new RefreshToken(
-//                    refreshTokenId,
-//                    "refreshtoken" + i,
-//                    ownerId,
-//                    refreshTokenExpirationTime,
-//                    refreshTokenIssuedAt
-//            );
-//            refreshTokenRepository.save(refreshToken);
-//            refreshTokens.add(refreshToken);
-//        }
-//
-//
-//        //expected
-//        String firstRefreshToken = refreshTokens.get(0).getToken();
-//        assertThatThrownBy(() -> sut.tokenRefresh(accessToken, firstRefreshToken))
-//                .isInstanceOf(InvalidRefreshTokenException.class);
-//    }
-//
-//    @Test
-//    @DisplayName("만료된 리프레시 토큰으로 토큰을 재발급할 수 없다.")
-//    void givenExpiredRefreshToken_whenTokenRefresh_thenExceptionShouldBeThrown() {
-//        //given
-//        UserId ownerId = UserId.of("ownerId");
-//
-//        String accessToken = jwtTokenProvider.generateToken(ownerId.getValue());
-//
-//        RefreshTokenId refreshTokenId = refreshTokenRepository.nextRefreshTokenId();
-//        LocalDateTime refreshTokenIssuedAt = LocalDateTime.now().minusMonths(2);
-//        LocalDateTime refreshTokenExpirationTime = refreshTokenIssuedAt.plusDays(30);
-//        RefreshToken refreshToken = new RefreshToken(
-//                refreshTokenId,
-//                "refreshtoken",
-//                ownerId,
-//                refreshTokenExpirationTime,
-//                refreshTokenIssuedAt
-//        );
-//        refreshTokenRepository.save(refreshToken);
-//
-//        //expected
-//        assertThatThrownBy(() -> sut.tokenRefresh(accessToken, refreshToken.getToken()))
-//                .isInstanceOf(ExpiredRefreshTokenException.class);
-//
-//    }
+    @DisplayName("유효하지 않은 액세스 토큰으로는 토큰을 재발급할 수 없다.")
+    @Test
+    void tokenRefreshWithInvalidAccessToken() {
+        // given
+        UserId ownerId = UserId.of("ownerId");
+        LocalDateTime currentTime = LocalDateTime.now();
+        String oldAccessToken = "invalid";
+
+        RefreshTokenId refreshTokenId = RefreshTokenId.of("refreshtokenid");
+        RefreshTokenJpaEntity refreshToken = refreshTokenJpaRepository.save(
+                new RefreshTokenJpaEntity(
+                        refreshTokenId.getValue(),
+                        "token",
+                        ownerId.getValue(),
+                        currentTime.plusMinutes(30),
+                        currentTime
+                ));
+
+        // expected
+        assertThatThrownBy(() -> sut.tokenRefresh(oldAccessToken, refreshToken.getToken(),
+                currentTime))
+                .isInstanceOf(InvalidAccessTokenException.class)
+                .hasMessage("유효하지 않은 액세스 토큰입니다.");
+    }
+
+    @DisplayName("소유자의 리프레시 토큰이 존재하지 않는다면 토큰을 재발급할 수 없다.")
+    @Test
+    void tokenRefreshWithNotFoundRefreshToken() {
+        // given
+        UserId ownerId = UserId.of("ownerId");
+        LocalDateTime currentTime = LocalDateTime.now();
+        String oldAccessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
+
+        // expected
+        assertThatThrownBy(() -> sut.tokenRefresh(oldAccessToken, "refresh",
+                currentTime))
+                .isInstanceOf(NotFoundRefreshTokenException.class)
+                .hasMessage("리프레시 토큰을 찾을 수 없습니다.");
+
+    }
+
+    @DisplayName("입력한 리프레시 토큰과 소유자가 가장 최근에 발행한 리프레시 토큰이 일치하지 않으면 토큰을 재발급할 수 없다.")
+    @Test
+    void tokenRefreshWhenInputRefreshTokenIsNotEqualToFoundRefreshToken() {
+        // given
+        UserId ownerId = UserId.of("ownerId");
+        LocalDateTime currentTime = LocalDateTime.now();
+        String oldAccessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
+
+        RefreshTokenId refreshTokenId = RefreshTokenId.of("refreshtokenid");
+        RefreshTokenJpaEntity refreshToken = refreshTokenJpaRepository.save(
+                new RefreshTokenJpaEntity(
+                        refreshTokenId.getValue(),
+                        "token",
+                        ownerId.getValue(),
+                        currentTime.plusMinutes(30),
+                        currentTime
+                ));
+
+        // expected
+        assertThatThrownBy(() -> sut.tokenRefresh(oldAccessToken, "mismatch",
+                currentTime))
+                .isInstanceOf(RefreshTokenMismatchException.class)
+                .hasMessage("리프레시 토큰 불일치: 요청된 리프레시 토큰과 저장된 리프레시 토큰이 일치하지 않습니다.");
+
+    }
+
+    @DisplayName("리프레시 토큰이 만료되었으면 토큰을 재발급할 수 없다.")
+    @Test
+    void tokenRefreshWithExpiredRefreshToken() {
+        // given
+        // given
+        UserId ownerId = UserId.of("ownerId");
+        LocalDateTime currentTime = LocalDateTime.now();
+        String oldAccessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
+
+        RefreshTokenId refreshTokenId = RefreshTokenId.of("refreshtokenid");
+        RefreshTokenJpaEntity refreshToken = refreshTokenJpaRepository.save(
+                new RefreshTokenJpaEntity(
+                        refreshTokenId.getValue(),
+                        "token",
+                        ownerId.getValue(),
+                        currentTime,
+                        currentTime
+                ));
+
+        // expected
+        assertThatThrownBy(() -> sut.tokenRefresh(oldAccessToken, refreshToken.getToken(),
+                currentTime))
+                .isInstanceOf(ExpiredRefreshTokenException.class)
+                .hasMessage("리프레시 토큰이 만료되었습니다.");
+
+    }
+
 }

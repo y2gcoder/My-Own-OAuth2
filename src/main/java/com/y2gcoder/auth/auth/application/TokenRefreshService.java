@@ -1,8 +1,5 @@
 package com.y2gcoder.auth.auth.application;
 
-import com.y2gcoder.auth.auth.domain.ExpiredRefreshTokenException;
-import com.y2gcoder.auth.auth.domain.InvalidRefreshTokenException;
-import com.y2gcoder.auth.auth.domain.NotFoundRefreshTokenException;
 import com.y2gcoder.auth.auth.domain.RefreshToken;
 import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
 import com.y2gcoder.auth.user.domain.UserId;
@@ -19,22 +16,46 @@ public class TokenRefreshService {
 
     public TokenRefreshDto tokenRefresh(String oldAccessToken, String inputRefreshToken,
             LocalDateTime currentTime) {
-        // 만료된 access token 에서 username 조회
         UserId ownerId = getOwnerIdBy(oldAccessToken);
 
-        // 입력받은 refresh token 과 username 으로 조회한 refresh token 비교
-        RefreshToken refreshToken = refreshTokenRepository
+        RefreshToken refreshToken = getRefreshTokenBy(ownerId);
+        validateRefreshToken(inputRefreshToken, refreshToken);
+
+        String accessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
+
+        return createTokenRefreshDto(refreshToken, accessToken);
+    }
+
+    private UserId getOwnerIdBy(String oldAccessToken) {
+        try {
+            String username = jwtTokenProvider.getUsernameFrom(oldAccessToken);
+            return UserId.of(username);
+        } catch (Exception e) {
+            throw new InvalidAccessTokenException("유효하지 않은 액세스 토큰입니다.", e);
+        }
+
+    }
+
+    private RefreshToken getRefreshTokenBy(UserId ownerId) {
+        return refreshTokenRepository
                 .findLatestRefreshTokenByOwnerId(ownerId)
                 .orElseThrow(NotFoundRefreshTokenException::new);
-        validateInputRefreshToken(inputRefreshToken, refreshToken);
+    }
 
-        // 조회한 refresh token 이 만료되었는지 확인
+    private void validateRefreshToken(String inputRefreshToken, RefreshToken refreshToken) {
+        if (areRefreshTokensMatching(inputRefreshToken, refreshToken)) {
+            throw new RefreshTokenMismatchException();
+        }
         if (refreshToken.isExpired()) {
             throw new ExpiredRefreshTokenException();
         }
+    }
 
-        // access token 을 재발급해 refresh token과 함께 보내주기
-        String accessToken = jwtTokenProvider.generateToken(ownerId.getValue(), currentTime);
+    private static boolean areRefreshTokensMatching(String inputRefreshToken, RefreshToken refreshToken) {
+        return !refreshToken.getToken().equals(inputRefreshToken);
+    }
+
+    private TokenRefreshDto createTokenRefreshDto(RefreshToken refreshToken, String accessToken) {
         LocalDateTime accessTokenExpirationTime = jwtTokenProvider.getExpiration(accessToken);
 
         AccessTokenDto accessTokenDto = new AccessTokenDto(accessToken, accessTokenExpirationTime);
@@ -42,16 +63,5 @@ public class TokenRefreshService {
                 refreshToken.getExpirationTime());
 
         return new TokenRefreshDto(accessTokenDto, refreshTokenDto);
-    }
-
-    private UserId getOwnerIdBy(String oldAccessToken) {
-        String username = jwtTokenProvider.getUsernameFrom(oldAccessToken);
-        return UserId.of(username);
-    }
-
-    private void validateInputRefreshToken(String inputRefreshToken, RefreshToken refreshToken) {
-        if (!refreshToken.getToken().equals(inputRefreshToken)) {
-            throw new InvalidRefreshTokenException();
-        }
     }
 }

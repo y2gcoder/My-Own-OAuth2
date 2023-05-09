@@ -12,11 +12,15 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 class OwnerServiceTest extends AuthIntegrationTestSupport {
 
     @Autowired
     private UserJpaRepository userJpaRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private OwnerService sut;
@@ -32,10 +36,11 @@ class OwnerServiceTest extends AuthIntegrationTestSupport {
         // given
         String email = "test@test.com";
         String password = "test1234";
+        String encryptedPassword = passwordEncoder.encode(password);
         userJpaRepository.save(new UserJpaEntity(
                 "userId",
                 email,
-                password,
+                encryptedPassword,
                 "name",
                 null
         ));
@@ -66,10 +71,11 @@ class OwnerServiceTest extends AuthIntegrationTestSupport {
         // given
         String email = "test@test.com";
         String password = "test1234";
+        String encryptedPassword = passwordEncoder.encode(password);
         userJpaRepository.save(new UserJpaEntity(
                 "userId",
                 email,
-                password,
+                encryptedPassword,
                 "name",
                 null
         ));

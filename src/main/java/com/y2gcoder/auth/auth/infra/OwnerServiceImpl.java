@@ -5,6 +5,7 @@ import com.y2gcoder.auth.user.application.UserRepository;
 import com.y2gcoder.auth.user.domain.User;
 import com.y2gcoder.auth.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OwnerServiceImpl implements OwnerService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserId getOwnerId(String email, String password) {
@@ -25,8 +27,7 @@ public class OwnerServiceImpl implements OwnerService {
     }
 
     private void verifyOwnerPassword(String rawPassword, String encryptedPassword) {
-        // TODO 암호화된 비밀번호와 대조하는 로직으로 바꿔야 함.
-        if (!rawPassword.equals(encryptedPassword)) {
+        if (!passwordEncoder.matches(rawPassword, encryptedPassword)) {
             throw new InvalidPasswordException();
         }
     }

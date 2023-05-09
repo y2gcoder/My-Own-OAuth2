@@ -3,7 +3,6 @@ package com.y2gcoder.auth.auth.infra;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -40,7 +39,8 @@ class JwtTokenProviderTest {
         String result = sut.generateToken(username, issuedAt);
 
         //then
-        sut.validateToken(result);
+        boolean isValid = sut.validateToken(result);
+        assertThat(isValid).isTrue();
     }
 
     @DisplayName("유효기간이 지난 토큰을 검증할 수 있다.")
@@ -57,8 +57,8 @@ class JwtTokenProviderTest {
         String result = sut.generateToken(username, issuedAt);
 
         //expected
-        assertThatThrownBy(() -> sut.validateToken(result))
-                .isInstanceOf(ExpiredJwtException.class);
+        boolean isValid = sut.validateToken(result);
+        assertThat(isValid).isFalse();
     }
 
     @DisplayName("잘못된 토큰을 검증할 수 있다.")
@@ -73,8 +73,8 @@ class JwtTokenProviderTest {
         String wrongToken = "wrongToken";
 
         //expected
-        assertThatThrownBy(() -> sut.validateToken(wrongToken))
-                .isInstanceOf(MalformedJwtException.class);
+        boolean isValid = sut.validateToken(wrongToken);
+        assertThat(isValid).isFalse();
     }
 
     @Test
@@ -95,8 +95,7 @@ class JwtTokenProviderTest {
         sut = new JwtTokenProvider(newSecretString, expiration);
 
         //expected
-        assertThatThrownBy(() -> sut.validateToken(token))
-                .isInstanceOf(SignatureException.class);
+        assertThat(sut.validateToken(token)).isFalse();
     }
 
     @DisplayName("토큰에서 username을 조회할 수 있다.")

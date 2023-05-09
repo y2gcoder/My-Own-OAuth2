@@ -50,8 +50,14 @@ public class JwtTokenProvider {
         }
     }
 
-    public void validateToken(String token) {
-        getClaims(token);
+    public boolean validateToken(String token) {
+        try {
+            getClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            log.warn("Jwt token validation failed: {}", e.getMessage());
+            return false;
+        }
     }
 
     public String getUsernameFrom(String token) {

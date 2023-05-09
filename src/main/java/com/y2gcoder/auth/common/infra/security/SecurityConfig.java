@@ -1,4 +1,4 @@
-package com.y2gcoder.auth.auth.infra.security;
+package com.y2gcoder.auth.common.infra.security;
 
 import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;

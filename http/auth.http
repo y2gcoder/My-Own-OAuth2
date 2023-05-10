@@ -1,0 +1,25 @@
+### 인증 코드 발급
+POST 127.0.0.1:8080/auth/code
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "test1234"
+}
+
+### 토큰발급
+POST 127.0.0.1:8080/auth/token
+Content-Type: application/json
+
+{
+  "code": ""
+}
+
+### 토큰 재발급
+POST 127.0.0.1:8080/auth/token/refresh
+Content-Type: application/json
+
+{
+  "access_token": "",
+  "refresh_token": ""
+}

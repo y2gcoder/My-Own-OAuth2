@@ -84,5 +84,35 @@ class UserRepositoryTest extends UserIntegrationTestSupport {
         assertThat(result.get().getId()).isEqualTo(UserId.of("userId"));
     }
 
+    @DisplayName("유저 ID로 유저를 찾을 수 있다.")
+    @Test
+    void findById() {
+        // given
+        UserId userId = UserId.of("userId");
+        UserJpaEntity jpaEntity = new UserJpaEntity(
+                userId.getValue(),
+                "test@test.com",
+                "test1234",
+                "name",
+                null
+        );
+        userJpaRepository.save(jpaEntity);
+
+        // when
+        Optional<User> result = sut.findById(userId);
+
+        // then
+        assertThat(result).isPresent();
+        assertThat(result.get()).extracting(
+                "id", "email", "password", "name", "deletedAt"
+        ).contains(
+                UserId.of(jpaEntity.getId()),
+                jpaEntity.getEmail(),
+                jpaEntity.getPassword(),
+                jpaEntity.getName(),
+                jpaEntity.getDeletedAt()
+        );
+
+    }
 
 }

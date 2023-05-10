@@ -8,6 +8,7 @@ import com.y2gcoder.auth.auth.application.RefreshTokenMismatchException;
 import com.y2gcoder.auth.auth.application.UnavailableAuthorizationCodeException;
 import com.y2gcoder.auth.auth.infra.InvalidPasswordException;
 import com.y2gcoder.auth.auth.infra.NotFoundOwnerException;
+import com.y2gcoder.auth.user.application.NotFoundUserException;
 import com.y2gcoder.auth.user.application.UserWithEmailExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
@@ -111,6 +112,18 @@ public class GlobalExceptionHandler {
             ExpiredRefreshTokenException e) {
         return ErrorResponse.builder()
                 .code(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
+                .message(e.getMessage())
+                .build();
+    }
+
+    /**
+     * 내 정보 찾기
+     */
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundUserException.class)
+    public ErrorResponse notFoundUserException(NotFoundUserException e) {
+        return ErrorResponse.builder()
+                .code(String.valueOf(HttpStatus.NOT_FOUND.value()))
                 .message(e.getMessage())
                 .build();
     }

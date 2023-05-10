@@ -40,4 +40,10 @@ public class UserRepositoryImpl implements UserRepository {
         Optional<UserJpaEntity> optionalUserJpaEntity = userJpaRepository.findByEmail(email);
         return optionalUserJpaEntity.map(UserJpaEntity::toDomain);
     }
+
+    @Override
+    public Optional<User> findById(UserId id) {
+        return userJpaRepository.findById(id.getValue())
+                .map(UserJpaEntity::toDomain);
+    }
 }

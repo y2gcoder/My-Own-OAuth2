@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.y2gcoder.auth.auth.application.IssueAuthorizationCodeService;
 import com.y2gcoder.auth.auth.application.SignInService;
 import com.y2gcoder.auth.auth.application.TokenRefreshService;
-import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
 import com.y2gcoder.auth.auth.infra.TokenConfig;
 import com.y2gcoder.auth.auth.ui.IssueAuthorizationCodeController;
 import com.y2gcoder.auth.auth.ui.SignInController;

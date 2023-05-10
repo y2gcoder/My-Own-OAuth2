@@ -4,13 +4,9 @@ import com.y2gcoder.auth.common.ui.LoggedInUserId;
 import com.y2gcoder.auth.user.application.UserInfoService;
 import com.y2gcoder.auth.user.domain.User;
 import com.y2gcoder.auth.user.domain.UserId;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

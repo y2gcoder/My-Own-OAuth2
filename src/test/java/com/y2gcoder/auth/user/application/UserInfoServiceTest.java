@@ -2,7 +2,6 @@ package com.y2gcoder.auth.user.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.y2gcoder.auth.user.UserIntegrationTestSupport;
 import com.y2gcoder.auth.user.domain.User;

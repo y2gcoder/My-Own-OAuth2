@@ -3,6 +3,7 @@ package com.y2gcoder.auth.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
 import com.y2gcoder.auth.auth.infra.TokenConfig;
+import com.y2gcoder.auth.common.infra.security.CustomAuthenticationEntryPoint;
 import com.y2gcoder.auth.common.infra.security.SecurityConfig;
 import com.y2gcoder.auth.user.application.SignUpService;
 import com.y2gcoder.auth.user.application.UserInfoService;
@@ -18,8 +19,13 @@ import org.springframework.test.web.servlet.MockMvc;
         SignUpController.class,
         GetMyInfoController.class
 })
-@Import({SecurityConfig.class, TokenConfig.class})
+@Import({
+        SecurityConfig.class,
+        TokenConfig.class,
+        CustomAuthenticationEntryPoint.class
+})
 public abstract class UserWebMvcTestSupport {
+
     @Autowired
     protected MockMvc mockMvc;
 

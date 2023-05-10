@@ -118,7 +118,7 @@ class TokenRefreshServiceTest extends AuthIntegrationTestSupport {
         assertThatThrownBy(() -> sut.tokenRefresh(oldAccessToken, refreshToken.getToken(),
                 currentTime))
                 .isInstanceOf(InvalidAccessTokenException.class)
-                .hasMessage("유효하지 않은 액세스 토큰입니다.");
+                .hasMessage("Authentication required. Please provide a valid token.");
     }
 
     @DisplayName("소유자의 리프레시 토큰이 존재하지 않는다면 토큰을 재발급할 수 없다.")

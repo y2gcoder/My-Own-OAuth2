@@ -1,8 +1,6 @@
 package com.y2gcoder.auth.user.ui;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -12,7 +10,6 @@ import com.y2gcoder.auth.user.UserWebMvcTestSupport;
 import com.y2gcoder.auth.user.application.NotFoundUserException;
 import com.y2gcoder.auth.user.domain.User;
 import com.y2gcoder.auth.user.domain.UserId;
-import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -34,7 +31,7 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
         );
 
         String token = "token";
-        willDoNothing().given(jwtTokenProvider).validateToken(token);
+        given(jwtTokenProvider.validateToken(token)).willReturn(true);
         given(jwtTokenProvider.getUsernameFrom(token)).willReturn(userId.getValue());
         given(userInfoService.findById(userId))
                 .willReturn(user);
@@ -71,7 +68,7 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
 
         // when
         String token = "token";
-        willDoNothing().given(jwtTokenProvider).validateToken(token);
+        given(jwtTokenProvider.validateToken(token)).willReturn(true);
         given(jwtTokenProvider.getUsernameFrom(token)).willReturn(userId.getValue());
         given(userInfoService.findById(userId))
                 .willReturn(user);
@@ -81,9 +78,9 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
                         get("/users/me")
                 )
                 .andDo(print())
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code")
-                        .value(String.valueOf(HttpStatus.BAD_REQUEST.value())))
+                        .value(String.valueOf(HttpStatus.UNAUTHORIZED.value())))
                 .andExpect(jsonPath("$.message")
                         .value("Authentication required. Please provide a valid token."));
 
@@ -103,8 +100,7 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
         );
 
         String token = "invalid";
-        willThrow(new JwtException("mocking jwtException")).given(jwtTokenProvider)
-                .validateToken(token);
+        given(jwtTokenProvider.validateToken(token)).willReturn(false);
 
         // expected
         mockMvc.perform(
@@ -119,7 +115,7 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
                 .andExpect(jsonPath("$.code")
                         .value(String.valueOf(HttpStatus.UNAUTHORIZED.value())))
                 .andExpect(jsonPath("$.message")
-                        .value("유효하지 않은 액세스 토큰입니다."));
+                        .value("Authentication required. Please provide a valid token."));
 
     }
 
@@ -137,8 +133,7 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
         );
 
         String token = "expired";
-        willThrow(new JwtException("mocking jwtException")).given(jwtTokenProvider)
-                .validateToken(token);
+        given(jwtTokenProvider.validateToken(token)).willReturn(false);
         given(jwtTokenProvider.getUsernameFrom(token)).willReturn(userId.getValue());
 
         // expected
@@ -154,7 +149,7 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
                 .andExpect(jsonPath("$.code")
                         .value(String.valueOf(HttpStatus.UNAUTHORIZED.value())))
                 .andExpect(jsonPath("$.message")
-                        .value("유효하지 않은 액세스 토큰입니다."));
+                        .value("Authentication required. Please provide a valid token."));
 
     }
 
@@ -172,7 +167,7 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
         );
 
         String token = "token";
-        willDoNothing().given(jwtTokenProvider).validateToken(token);
+        given(jwtTokenProvider.validateToken(token)).willReturn(true);
         given(jwtTokenProvider.getUsernameFrom(token)).willReturn(userId.getValue());
         given(userInfoService.findById(userId))
                 .willThrow(new NotFoundUserException(userId));

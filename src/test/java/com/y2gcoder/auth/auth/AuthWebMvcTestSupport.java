@@ -8,6 +8,7 @@ import com.y2gcoder.auth.auth.infra.TokenConfig;
 import com.y2gcoder.auth.auth.ui.IssueAuthorizationCodeController;
 import com.y2gcoder.auth.auth.ui.SignInController;
 import com.y2gcoder.auth.auth.ui.TokenRefreshController;
+import com.y2gcoder.auth.common.infra.security.CustomAuthenticationEntryPoint;
 import com.y2gcoder.auth.common.infra.security.SecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,9 +23,11 @@ import org.springframework.test.web.servlet.MockMvc;
 })
 @Import({
         SecurityConfig.class,
-        TokenConfig.class
+        TokenConfig.class,
+        CustomAuthenticationEntryPoint.class
 })
 public abstract class AuthWebMvcTestSupport {
+
     @Autowired
     protected MockMvc mockMvc;
 

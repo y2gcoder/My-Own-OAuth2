@@ -29,18 +29,19 @@ public class LoggedInUserIdArgumentResolver implements HandlerMethodArgumentReso
         String authorizationHeader = webRequest.getHeader("Authorization");
         if (!StringUtils.hasText(authorizationHeader) || !authorizationHeader.startsWith(
                 "Bearer ")) {
-            throw new IllegalArgumentException(
-                    "Authentication required. Please provide a valid token.");
+            throw new InvalidAccessTokenException();
         }
 
         String accessToken = authorizationHeader.split("Bearer ")[1];
+        if (!jwtTokenProvider.validateToken(accessToken)) {
+            throw new InvalidAccessTokenException();
 
+        }
         return getUsernameBy(accessToken);
     }
 
     private UserId getUsernameBy(String accessToken) {
         try {
-            jwtTokenProvider.validateToken(accessToken);
             String username = jwtTokenProvider.getUsernameFrom(accessToken);
             return UserId.of(username);
         } catch (Exception e) {

@@ -20,9 +20,11 @@ import org.springframework.test.web.servlet.MockMvc;
         SignInController.class,
         TokenRefreshController.class
 })
-@Import({SecurityConfig.class, TokenConfig.class})
+@Import({
+        SecurityConfig.class,
+        TokenConfig.class
+})
 public abstract class AuthWebMvcTestSupport {
-
     @Autowired
     protected MockMvc mockMvc;
 

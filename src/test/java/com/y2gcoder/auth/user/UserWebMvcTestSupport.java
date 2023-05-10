@@ -1,9 +1,12 @@
 package com.y2gcoder.auth.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
 import com.y2gcoder.auth.auth.infra.TokenConfig;
 import com.y2gcoder.auth.common.infra.security.SecurityConfig;
 import com.y2gcoder.auth.user.application.SignUpService;
+import com.y2gcoder.auth.user.application.UserInfoService;
+import com.y2gcoder.auth.user.ui.GetMyInfoController;
 import com.y2gcoder.auth.user.ui.SignUpController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,11 +15,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = {
-        SignUpController.class
+        SignUpController.class,
+        GetMyInfoController.class
 })
 @Import({SecurityConfig.class, TokenConfig.class})
 public abstract class UserWebMvcTestSupport {
-
     @Autowired
     protected MockMvc mockMvc;
 
@@ -25,4 +28,10 @@ public abstract class UserWebMvcTestSupport {
 
     @MockBean
     protected SignUpService signUpService;
+
+    @MockBean
+    protected JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    protected UserInfoService userInfoService;
 }

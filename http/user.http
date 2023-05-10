@@ -1,0 +1,13 @@
+### 회원가입
+POST 127.0.0.1:8080/users
+Content-Type: application/json
+
+{
+  "email": "test@test.com",
+  "password": "test1234",
+  "name": "테스터"
+}
+
+### 내 정보 조회
+GET 127.0.0.1:8080/users/me
+Authorization: Bearer

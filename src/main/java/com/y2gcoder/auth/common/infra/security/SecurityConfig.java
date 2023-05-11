@@ -10,6 +10,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -21,30 +26,45 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
+    private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
+        http.cors()
+                .and()
                 .httpBasic().disable()
                 .formLogin().disable()
                 .csrf().disable()
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http.exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint);
+
+        http.authorizeHttpRequests(
+                authorize -> authorize
+                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/code").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/token").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/token/refresh").permitAll()
+                        .requestMatchers("/oauth2/**").permitAll()
+                        .requestMatchers("/login/**").permitAll()
+                        .anyRequest().authenticated()
+        );
+
+        http.oauth2Login()
+                .authorizationEndpoint()
+                .authorizationRequestRepository(authorizationRequestRepository)
                 .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeHttpRequests(
-                        authorize -> authorize
-                                .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/auth/code").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/auth/token").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/auth/token/refresh").permitAll()
-                                .anyRequest().authenticated()
-                )
+                .userInfoEndpoint().userService(oAuth2UserService);
+
+        http
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

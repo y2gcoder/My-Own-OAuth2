@@ -1,6 +1,6 @@
 token:
   access:
-    secret: g83EgWbJix9kie3SWNrYj/OwVFnK/KVqE8DXSGKYq3o=
+    secret: ${jwt-secret}
     expiration: PT15M
   refresh:
     expiration: P30D
@@ -8,3 +8,16 @@ token:
 basic:
   authorization-code:
     expiration: PT5M
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${oauth2-google-id}
+            client-secret: ${oauth2-google-secret}
+            scope:
+              - openid
+              - profile
+              - email
+            authorization-grant-type: authorization_code

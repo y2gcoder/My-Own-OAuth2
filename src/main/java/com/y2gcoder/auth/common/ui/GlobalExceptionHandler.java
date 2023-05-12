@@ -10,12 +10,14 @@ import com.y2gcoder.auth.auth.infra.InvalidPasswordException;
 import com.y2gcoder.auth.auth.infra.NotFoundOwnerException;
 import com.y2gcoder.auth.user.application.NotFoundUserException;
 import com.y2gcoder.auth.user.application.UserWithEmailExistsException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -152,6 +154,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorResponse exception(Exception e) {
+        log.error("An unknown exception has occurred!!", e);
         return ErrorResponse.builder()
                 .code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
                 .message(e.getMessage())

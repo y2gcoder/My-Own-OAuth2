@@ -1,5 +1,6 @@
 package com.y2gcoder.auth.oauth.application.dto;
 
+import com.y2gcoder.auth.oauth.domain.OAuth2Provider;
 import java.util.Map;
 
 public class GoogleOAuth2UserInfo extends OAuth2UserInfo {
@@ -26,5 +27,10 @@ public class GoogleOAuth2UserInfo extends OAuth2UserInfo {
     @Override
     public String getProfileImageUrl() {
         return (String) attributes.get("picture");
+    }
+
+    @Override
+    public OAuth2Provider getProvider() {
+        return OAuth2Provider.GOOGLE;
     }
 }

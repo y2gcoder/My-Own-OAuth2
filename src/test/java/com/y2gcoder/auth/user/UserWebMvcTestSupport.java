@@ -2,11 +2,11 @@ package com.y2gcoder.auth.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
-import com.y2gcoder.auth.auth.infra.TokenConfig;
-import com.y2gcoder.auth.common.infra.security.CustomAuthenticationEntryPoint;
 import com.y2gcoder.auth.common.infra.security.SecurityConfig;
+import com.y2gcoder.auth.oauth.infra.OAuth2Config;
 import com.y2gcoder.auth.user.application.SignUpService;
 import com.y2gcoder.auth.user.application.UserInfoService;
+import com.y2gcoder.auth.user.application.UserRepository;
 import com.y2gcoder.auth.user.ui.GetMyInfoController;
 import com.y2gcoder.auth.user.ui.SignUpController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 })
 @Import({
         SecurityConfig.class,
-        TokenConfig.class,
-        CustomAuthenticationEntryPoint.class
+        OAuth2Config.class
 })
 public abstract class UserWebMvcTestSupport {
 
@@ -40,4 +39,7 @@ public abstract class UserWebMvcTestSupport {
 
     @MockBean
     protected UserInfoService userInfoService;
+
+    @MockBean
+    private UserRepository userRepository;
 }

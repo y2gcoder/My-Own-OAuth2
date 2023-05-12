@@ -17,7 +17,6 @@ spring:
             client-id: ${oauth2-google-id}
             client-secret: ${oauth2-google-secret}
             scope:
-              - openid
               - profile
               - email
             authorization-grant-type: authorization_code

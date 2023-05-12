@@ -11,4 +11,6 @@ public interface OAuth2AuthenticationRepository {
     OAuth2AuthenticationId nextOAuth2AuthenticationId();
 
     Optional<OAuth2Authentication> findByProviderId(String providerId);
+
+    void delete(OAuth2Authentication oAuth2Authentication);
 }

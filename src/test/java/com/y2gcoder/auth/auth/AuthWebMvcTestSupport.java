@@ -2,13 +2,16 @@ package com.y2gcoder.auth.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.y2gcoder.auth.auth.application.IssueAuthorizationCodeService;
+import com.y2gcoder.auth.auth.application.RefreshTokenRepository;
 import com.y2gcoder.auth.auth.application.SignInService;
 import com.y2gcoder.auth.auth.application.TokenRefreshService;
+import com.y2gcoder.auth.auth.domain.RefreshTokenProvider;
 import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
 import com.y2gcoder.auth.auth.ui.IssueAuthorizationCodeController;
 import com.y2gcoder.auth.auth.ui.SignInController;
 import com.y2gcoder.auth.auth.ui.TokenRefreshController;
 import com.y2gcoder.auth.common.infra.security.SecurityConfig;
+import com.y2gcoder.auth.oauth.application.OAuth2AuthenticationRepository;
 import com.y2gcoder.auth.oauth.infra.OAuth2Config;
 import com.y2gcoder.auth.user.application.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +51,14 @@ public abstract class AuthWebMvcTestSupport {
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private OAuth2AuthenticationRepository oAuth2AuthenticationRepository;
+
+    @MockBean
+    private RefreshTokenRepository refreshTokenRepository;
+
+    @MockBean
+    private RefreshTokenProvider refreshTokenProvider;
 
 }

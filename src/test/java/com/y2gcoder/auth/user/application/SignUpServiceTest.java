@@ -40,9 +40,10 @@ class SignUpServiceTest extends UserIntegrationTestSupport {
         String email = "test@test.com";
         String password = "test1234";
         String name = "name";
+        String profileImageUrl = "profileImage";
 
         // when
-        User result = sut.signUp(email, password, name);
+        User result = sut.signUp(email, password, name, profileImageUrl);
 
         // then
         assertThat(result.getId()).isNotNull();
@@ -59,9 +60,10 @@ class SignUpServiceTest extends UserIntegrationTestSupport {
         String email = "test@test.com";
         String password = "test123";
         String name = "name";
+        String profileImageUrl = "profileImage";
 
         // expected
-        assertThatThrownBy(() -> sut.signUp(email, password, name))
+        assertThatThrownBy(() -> sut.signUp(email, password, name, profileImageUrl))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("비밀번호는 8자리 이상이어야 합니다.");
     }
@@ -73,9 +75,10 @@ class SignUpServiceTest extends UserIntegrationTestSupport {
         String email = "test@test.com";
         String password = "test1234";
         String name = "한";
+        String profileImageUrl = "profileImage";
 
         // expected
-        assertThatThrownBy(() -> sut.signUp(email, password, name))
+        assertThatThrownBy(() -> sut.signUp(email, password, name, profileImageUrl))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("이름은 2글자 이상이어야 합니다.");
     }
@@ -88,17 +91,19 @@ class SignUpServiceTest extends UserIntegrationTestSupport {
         String email = "test@test.com";
         String password = "test1234";
         String name = "name";
+        String profileImageUrl = "profileImage";
 
         userJpaRepository.save(new UserJpaEntity(
                 userId.getValue(),
                 email,
                 password,
                 name,
-                null
+                null,
+                profileImageUrl
         ));
 
         // expected
-        assertThatThrownBy(() -> sut.signUp(email, password, name))
+        assertThatThrownBy(() -> sut.signUp(email, password, name, profileImageUrl))
                 .isInstanceOf(UserWithEmailExistsException.class)
                 .hasMessage(String.format("해당 이메일을 가진 회원이 이미 존재합니다. email=%s", email));
 

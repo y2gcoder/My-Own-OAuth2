@@ -41,6 +41,7 @@ class IssueAuthorizationCodeServiceTest extends AuthIntegrationTestSupport {
                 "test@test.com",
                 passwordEncoder.encode("test1234"),
                 "name",
+                null,
                 null
         ));
     }

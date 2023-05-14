@@ -15,14 +15,19 @@ public class SignUpService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public User signUp(String email, String password, String name) {
+    public User signUp(String email, String password, String name, String profileImageUrl) {
         validatePassword(password);
         validateName(name);
         checkIfUserExistsByEmail(email);
 
         UserId userId = userRepository.nextUserId();
         String encryptedPassword = createEncryptedPassword(password);
-        return userRepository.save(new User(userId, email, encryptedPassword, name, null));
+        return userRepository.save(new User(userId,
+                email,
+                encryptedPassword,
+                name,
+                null,
+                profileImageUrl));
     }
 
     private String createEncryptedPassword(String password) {

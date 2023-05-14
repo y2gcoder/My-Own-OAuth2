@@ -38,7 +38,8 @@ class UserInfoServiceTest  extends UserIntegrationTestSupport {
                 "test@test.com",
                 "test1234",
                 "name",
-                null
+                null,
+                "profileImage"
         );
         userJpaRepository.save(jpaEntity);
 

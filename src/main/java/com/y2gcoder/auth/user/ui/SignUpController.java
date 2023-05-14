@@ -16,7 +16,8 @@ public class SignUpController {
 
     @PostMapping("/users")
     public ResponseEntity<Void> signUp(@RequestBody @Valid SignUpRequest request) {
-        signUpService.signUp(request.getEmail(), request.getPassword(), request.getName());
+        signUpService.signUp(request.getEmail(), request.getPassword(), request.getName(),
+                request.getProfileImageUrl());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

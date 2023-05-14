@@ -27,7 +27,8 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
                 "test@test.com",
                 "test1234",
                 "name",
-                null
+                null,
+                "profileImage"
         );
 
         String token = "token";
@@ -49,7 +50,9 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
                 .andExpect(jsonPath("$.id").value(userId.getValue()))
                 .andExpect(jsonPath("$.email").value(user.getEmail()))
                 .andExpect(jsonPath("$.name").value(user.getName()))
-                .andExpect(jsonPath("$.is_deleted").value(false));
+                .andExpect(jsonPath("$.is_deleted").value(false))
+                .andExpect(jsonPath("$.profile_image_url")
+                        .value("profileImage"));
     }
 
 
@@ -63,7 +66,8 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
                 "test@test.com",
                 "test1234",
                 "name",
-                null
+                null,
+                "profileImage"
         );
 
         // when
@@ -96,7 +100,8 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
                 "test@test.com",
                 "test1234",
                 "name",
-                null
+                null,
+                "profileImage"
         );
 
         String token = "invalid";
@@ -129,7 +134,8 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
                 "test@test.com",
                 "test1234",
                 "name",
-                null
+                null,
+                "profileImage"
         );
 
         String token = "expired";
@@ -163,7 +169,8 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
                 "test@test.com",
                 "test1234",
                 "name",
-                null
+                null,
+                "profileImage"
         );
 
         String token = "token";

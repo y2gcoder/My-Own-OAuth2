@@ -14,11 +14,15 @@ public class MyInfoResponse {
     @JsonProperty("is_deleted")
     private boolean isDeleted;
 
+    private String profileImageUrl;
+
     public MyInfoResponse(User user) {
         this.id = user.getId().getValue();
         this.email = user.getEmail();
         this.name = user.getName();
         this.isDeleted = user.isDeleted();
+        this.profileImageUrl = user.getProfileImageUrl();
+
     }
 
     public String getId() {
@@ -36,5 +40,9 @@ public class MyInfoResponse {
     @JsonProperty("is_deleted")
     public boolean isDeleted() {
         return isDeleted;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
     }
 }

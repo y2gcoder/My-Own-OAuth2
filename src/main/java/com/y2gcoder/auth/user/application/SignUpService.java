@@ -13,13 +13,18 @@ public class SignUpService {
 
     private final UserRepository userRepository;
 
-    public User signUp(String email, String password, String name) {
+    public User signUp(String email, String password, String name, String profileImageUrl) {
         validatePassword(password);
         validateName(name);
         checkIfUserExistsByEmail(email);
 
         UserId userId = userRepository.nextUserId();
-        return userRepository.save(new User(userId, email, password, name, null));
+        return userRepository.save(new User(userId,
+                email,
+                password,
+                name,
+                null,
+                profileImageUrl));
     }
 
     private void validatePassword(String password) {

@@ -52,7 +52,8 @@ class UserRepositoryTest extends UserIntegrationTestSupport {
                 "test@test.com",
                 "password",
                 "name",
-                null
+                null,
+                "profileImage"
         );
 
         // when
@@ -73,7 +74,8 @@ class UserRepositoryTest extends UserIntegrationTestSupport {
                 email,
                 "test1234",
                 "name",
-                null
+                null,
+                "profileImage"
         ));
 
         // when
@@ -94,7 +96,8 @@ class UserRepositoryTest extends UserIntegrationTestSupport {
                 "test@test.com",
                 "test1234",
                 "name",
-                null
+                null,
+                "profileImage"
         );
         userJpaRepository.save(jpaEntity);
 

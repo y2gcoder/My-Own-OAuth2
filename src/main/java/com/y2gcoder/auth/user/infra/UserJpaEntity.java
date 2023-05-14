@@ -31,13 +31,16 @@ public class UserJpaEntity extends BaseTimeEntity {
 
     private LocalDateTime deletedAt;
 
+    private String profileImageUrl;
+
     public static UserJpaEntity fromDomain(User user) {
         return new UserJpaEntity(
                 user.getId().getValue(),
                 user.getEmail(),
                 user.getPassword(),
                 user.getName(),
-                user.getDeletedAt()
+                user.getDeletedAt(),
+                user.getProfileImageUrl()
         );
     }
 
@@ -47,7 +50,8 @@ public class UserJpaEntity extends BaseTimeEntity {
                 email,
                 password,
                 name,
-                deletedAt
+                deletedAt,
+                profileImageUrl
         );
     }
 }

@@ -1,10 +1,8 @@
 package com.y2gcoder.auth.oauth.infra;
 
-import com.y2gcoder.auth.auth.application.RefreshTokenRepository;
-import com.y2gcoder.auth.auth.domain.RefreshToken;
-import com.y2gcoder.auth.auth.domain.RefreshTokenId;
-import com.y2gcoder.auth.auth.domain.RefreshTokenProvider;
-import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
+import com.y2gcoder.auth.auth.application.AccessTokenDto;
+import com.y2gcoder.auth.auth.application.CreateTokenService;
+import com.y2gcoder.auth.auth.application.RefreshTokenDto;
 import com.y2gcoder.auth.oauth.application.dto.CustomOAuth2UserDetails;
 import com.y2gcoder.auth.user.domain.UserId;
 import jakarta.servlet.FilterChain;
@@ -25,10 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final CookieOAuth2AuthorizationRequestRepository authorizationRequestRepository;
-    // TODO 바운디드 컨텍스트를 위해 리팩토링 필요
-    private final JwtTokenProvider jwtTokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final RefreshTokenProvider refreshTokenProvider;
+    private final CreateTokenService createTokenService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -55,24 +50,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         UserId userId = userDetails.getId();
         LocalDateTime now = LocalDateTime.now();
 
-        String accessToken = jwtTokenProvider.generateToken(userId.getValue(), now);
-        RefreshToken refreshToken = createRefreshToken(now, userId);
+        AccessTokenDto accessTokenDto = createTokenService.createAccessToken(userId, now);
+        RefreshTokenDto refreshTokenDto = createTokenService.createRefreshToken(userId, now);
 
         return UriComponentsBuilder.fromUriString(redirectUri)
-                .queryParam("access_token", accessToken)
-                .queryParam("refresh_token", refreshToken.getToken())
+                .queryParam("access_token", accessTokenDto.getToken())
+                .queryParam("refresh_token", refreshTokenDto.getToken())
                 .build().toUriString();
-    }
-
-    private RefreshToken createRefreshToken(LocalDateTime currentTime, UserId ownerId) {
-        RefreshTokenId refreshTokenId = refreshTokenRepository.nextRefreshTokenId();
-        LocalDateTime refreshTokenExpirationTime = refreshTokenProvider.getExpirationTime(
-                currentTime);
-
-        return refreshTokenRepository.save(new RefreshToken(refreshTokenId,
-                refreshTokenProvider.generateToken(),
-                ownerId,
-                refreshTokenExpirationTime, currentTime));
     }
 
     protected void clearAuthenticationAttributes(HttpServletRequest request,

@@ -1,8 +1,6 @@
 package com.y2gcoder.auth.oauth.infra;
 
-import com.y2gcoder.auth.auth.application.RefreshTokenRepository;
-import com.y2gcoder.auth.auth.domain.RefreshTokenProvider;
-import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
+import com.y2gcoder.auth.auth.application.CreateTokenService;
 import com.y2gcoder.auth.oauth.application.CustomOAuth2UserService;
 import com.y2gcoder.auth.oauth.application.OAuth2AuthenticationRepository;
 import com.y2gcoder.auth.user.application.UserRepository;
@@ -23,9 +21,7 @@ public class OAuth2Config {
 
     private final OAuth2AuthenticationRepository oAuth2AuthenticationRepository;
     private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final RefreshTokenProvider refreshTokenProvider;
+    private final CreateTokenService createTokenService;
 
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService() {
@@ -41,9 +37,7 @@ public class OAuth2Config {
     public AuthenticationSuccessHandler authenticationSuccessHandler() {
         return new OAuth2AuthenticationSuccessHandler(
                 (CookieOAuth2AuthorizationRequestRepository) authorizationRequestRepository(),
-                jwtTokenProvider,
-                refreshTokenRepository,
-                refreshTokenProvider);
+                createTokenService);
     }
 
     @Bean

@@ -1,11 +1,10 @@
 package com.y2gcoder.auth.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.y2gcoder.auth.auth.application.CreateTokenService;
 import com.y2gcoder.auth.auth.application.IssueAuthorizationCodeService;
-import com.y2gcoder.auth.auth.application.RefreshTokenRepository;
 import com.y2gcoder.auth.auth.application.SignInService;
 import com.y2gcoder.auth.auth.application.TokenRefreshService;
-import com.y2gcoder.auth.auth.domain.RefreshTokenProvider;
 import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
 import com.y2gcoder.auth.auth.ui.IssueAuthorizationCodeController;
 import com.y2gcoder.auth.auth.ui.SignInController;
@@ -47,18 +46,15 @@ public abstract class AuthWebMvcTestSupport {
     protected TokenRefreshService tokenRefreshService;
 
     @MockBean
-    private JwtTokenProvider jwtTokenProvider;
-
-    @MockBean
     private UserRepository userRepository;
 
     @MockBean
     private OAuth2AuthenticationRepository oAuth2AuthenticationRepository;
 
     @MockBean
-    private RefreshTokenRepository refreshTokenRepository;
+    private JwtTokenProvider jwtTokenProvider;
 
     @MockBean
-    private RefreshTokenProvider refreshTokenProvider;
+    private CreateTokenService createTokenService;
 
 }

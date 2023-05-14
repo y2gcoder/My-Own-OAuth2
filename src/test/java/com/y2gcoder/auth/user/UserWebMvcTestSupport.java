@@ -1,8 +1,7 @@
 package com.y2gcoder.auth.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.y2gcoder.auth.auth.application.RefreshTokenRepository;
-import com.y2gcoder.auth.auth.domain.RefreshTokenProvider;
+import com.y2gcoder.auth.auth.application.CreateTokenService;
 import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
 import com.y2gcoder.auth.common.infra.security.SecurityConfig;
 import com.y2gcoder.auth.oauth.application.OAuth2AuthenticationRepository;
@@ -49,9 +48,7 @@ public abstract class UserWebMvcTestSupport {
     @MockBean
     private OAuth2AuthenticationRepository oAuth2AuthenticationRepository;
 
-    @MockBean
-    private RefreshTokenRepository refreshTokenRepository;
 
     @MockBean
-    private RefreshTokenProvider refreshTokenProvider;
+    private CreateTokenService createTokenService;
 }

@@ -30,7 +30,7 @@ class UserInfoServiceTest  extends UserIntegrationTestSupport {
 
     @DisplayName("유저 ID로 해당 유저를 찾을 수 있다.")
     @Test
-    void findById() {
+    void getById() {
         // given
         UserId userId = UserId.of("userId");
         UserJpaEntity jpaEntity = new UserJpaEntity(
@@ -44,7 +44,7 @@ class UserInfoServiceTest  extends UserIntegrationTestSupport {
         userJpaRepository.save(jpaEntity);
 
         // when
-        User result = sut.findById(userId);
+        User result = sut.getById(userId);
 
         // then
         assertThat(result).extracting(
@@ -60,12 +60,12 @@ class UserInfoServiceTest  extends UserIntegrationTestSupport {
 
     @DisplayName("해당 유저 ID를 가진 유저가 없을 수 있다.")
     @Test
-    void findByIdWithNotFound() {
+    void getByIdWithNotFound() {
         // given
         UserId userId = UserId.of("userId");
 
         // expected
-        assertThatThrownBy(() -> sut.findById(userId))
+        assertThatThrownBy(() -> sut.getById(userId))
                 .isInstanceOf(NotFoundUserException.class)
                 .hasMessage(String.format("해당 유저를 찾을 수 없습니다. userId=%s", userId.getValue()));
 

@@ -34,7 +34,7 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
         String token = "token";
         given(jwtTokenProvider.validateToken(token)).willReturn(true);
         given(jwtTokenProvider.getUsernameFrom(token)).willReturn(userId.getValue());
-        given(userInfoService.findById(userId))
+        given(userInfoService.getById(userId))
                 .willReturn(user);
 
         // expected
@@ -74,7 +74,7 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
         String token = "token";
         given(jwtTokenProvider.validateToken(token)).willReturn(true);
         given(jwtTokenProvider.getUsernameFrom(token)).willReturn(userId.getValue());
-        given(userInfoService.findById(userId))
+        given(userInfoService.getById(userId))
                 .willReturn(user);
 
         // expected
@@ -176,7 +176,7 @@ class GetMyInfoControllerTest extends UserWebMvcTestSupport {
         String token = "token";
         given(jwtTokenProvider.validateToken(token)).willReturn(true);
         given(jwtTokenProvider.getUsernameFrom(token)).willReturn(userId.getValue());
-        given(userInfoService.findById(userId))
+        given(userInfoService.getById(userId))
                 .willThrow(new NotFoundUserException(userId));
 
         // expected

@@ -25,7 +25,8 @@ class UserJpaRepositoryTest extends UserIntegrationTestSupport {
                 targetEmail,
                 "password",
                 "name",
-                null
+                null,
+                "profileImage"
         ));
 
         // when
@@ -44,7 +45,8 @@ class UserJpaRepositoryTest extends UserIntegrationTestSupport {
                 "test@test.com",
                 "password",
                 "name",
-                null
+                null,
+                "profileImage"
         ));
 
         // when

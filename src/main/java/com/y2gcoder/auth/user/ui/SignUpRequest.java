@@ -18,10 +18,14 @@ public class SignUpRequest {
     @NotBlank(message = "이름은 필수값입니다.")
     private String name;
 
+    private String profileImageUrl;
+
     @Builder
-    private SignUpRequest(String email, String password, String name) {
+
+    private SignUpRequest(String email, String password, String name, String profileImageUrl) {
         this.email = email;
         this.password = password;
         this.name = name;
+        this.profileImageUrl = profileImageUrl;
     }
 }

@@ -37,6 +37,7 @@ class IssueAuthorizationCodeServiceTest extends AuthIntegrationTestSupport {
                 "test@test.com",
                 "test1234",
                 "name",
+                null,
                 null
         ));
     }

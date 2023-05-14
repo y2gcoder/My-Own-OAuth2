@@ -23,6 +23,7 @@ class SignUpControllerTest extends UserWebMvcTestSupport {
                 .email("test@test.com")
                 .password("password")
                 .name("name")
+                .profileImageUrl("profileImage")
                 .build();
 
         // expected
@@ -40,6 +41,7 @@ class SignUpControllerTest extends UserWebMvcTestSupport {
         SignUpRequest request = SignUpRequest.builder()
                 .password("password")
                 .name("name")
+                .profileImageUrl("profileImage")
                 .build();
 
         // expected
@@ -60,6 +62,7 @@ class SignUpControllerTest extends UserWebMvcTestSupport {
                 .email("test")
                 .password("password")
                 .name("name")
+                .profileImageUrl("profileImage")
                 .build();
 
         // expected
@@ -79,6 +82,7 @@ class SignUpControllerTest extends UserWebMvcTestSupport {
         SignUpRequest request = SignUpRequest.builder()
                 .email("test@test.com")
                 .name("name")
+                .profileImageUrl("profileImage")
                 .build();
 
         // expected
@@ -98,6 +102,7 @@ class SignUpControllerTest extends UserWebMvcTestSupport {
         SignUpRequest request = SignUpRequest.builder()
                 .email("test@test.com")
                 .password("password")
+                .profileImageUrl("profileImage")
                 .build();
 
         // expected
@@ -118,9 +123,10 @@ class SignUpControllerTest extends UserWebMvcTestSupport {
                 .email("test@test.com")
                 .password("password")
                 .name("name")
+                .profileImageUrl("profileImage")
                 .build();
 
-        given(signUpService.signUp(anyString(), anyString(), anyString()))
+        given(signUpService.signUp(anyString(), anyString(), anyString(), anyString()))
                 .willThrow(new UserWithEmailExistsException("test@test.com"));
 
 

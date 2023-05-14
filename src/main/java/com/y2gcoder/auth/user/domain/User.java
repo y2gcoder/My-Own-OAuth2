@@ -12,6 +12,8 @@ public class User {
 
     private LocalDateTime deletedAt;
 
+    private String profileImageUrl;
+
     public UserId getId() {
         return id;
     }
@@ -32,12 +34,18 @@ public class User {
         return deletedAt;
     }
 
-    public User(UserId id, String email, String password, String name, LocalDateTime deletedAt) {
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public User(UserId id, String email, String password, String name, LocalDateTime deletedAt,
+            String profileImageUrl) {
         this.id = id;
         this.email = email;
         this.password = password;
         this.name = name;
         this.deletedAt = deletedAt;
+        this.profileImageUrl = profileImageUrl;
     }
 
     public void delete(LocalDateTime deletedAt) {

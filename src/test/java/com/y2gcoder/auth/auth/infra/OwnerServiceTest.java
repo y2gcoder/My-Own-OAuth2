@@ -37,6 +37,7 @@ class OwnerServiceTest extends AuthIntegrationTestSupport {
                 email,
                 password,
                 "name",
+                null,
                 null
         ));
 
@@ -71,6 +72,7 @@ class OwnerServiceTest extends AuthIntegrationTestSupport {
                 email,
                 password,
                 "name",
+                null,
                 null
         ));
 

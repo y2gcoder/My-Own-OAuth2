@@ -19,7 +19,7 @@ class UserTest {
                 "test@test.com",
                 "password",
                 "name",
-                deletedAt);
+                deletedAt, "profileImage");
 
         // when
         boolean result = user.isDeleted();
@@ -36,7 +36,7 @@ class UserTest {
                 "test@test.com",
                 "password",
                 "name",
-                null);
+                null, "profileImage");
         assertThat(user.isDeleted()).isFalse();
 
         LocalDateTime deletedAt = LocalDateTime.of(2023, 5, 3, 15, 28);
@@ -58,7 +58,7 @@ class UserTest {
                 "test@test.com",
                 "password",
                 "name",
-                deletedAt);
+                deletedAt, "profileImage");
 
         assertThat(user.isDeleted()).isTrue();
 

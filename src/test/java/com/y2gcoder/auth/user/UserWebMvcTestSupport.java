@@ -1,20 +1,23 @@
 package com.y2gcoder.auth.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.y2gcoder.auth.auth.application.CreateTokenService;
 import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
 import com.y2gcoder.auth.common.infra.security.SecurityConfig;
-import com.y2gcoder.auth.oauth.application.OAuth2AuthenticationRepository;
-import com.y2gcoder.auth.oauth.infra.OAuth2Config;
 import com.y2gcoder.auth.user.application.SignUpService;
 import com.y2gcoder.auth.user.application.UserInfoService;
-import com.y2gcoder.auth.user.application.UserRepository;
 import com.y2gcoder.auth.user.ui.GetMyInfoController;
 import com.y2gcoder.auth.user.ui.SignUpController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(controllers = {
@@ -22,8 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
         GetMyInfoController.class
 })
 @Import({
-        SecurityConfig.class,
-        OAuth2Config.class
+        SecurityConfig.class
 })
 public abstract class UserWebMvcTestSupport {
 
@@ -43,12 +45,14 @@ public abstract class UserWebMvcTestSupport {
     protected UserInfoService userInfoService;
 
     @MockBean
-    private UserRepository userRepository;
+    private AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository;
 
     @MockBean
-    private OAuth2AuthenticationRepository oAuth2AuthenticationRepository;
-
+    private OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
 
     @MockBean
-    private CreateTokenService createTokenService;
+    private AuthenticationSuccessHandler authenticationSuccessHandler;
+
+    @MockBean
+    private AuthenticationFailureHandler authenticationFailureHandler;
 }

@@ -1,0 +1,5 @@
+### OAuth2 인증 요청용 URI 조회(Google)
+GET 127.0.0.1:8080/oauth2/auth/google?redirect_uri=http://localhost:3000/test
+
+### OAuth2 인증 요청용 URI 조회(Kakao)
+GET 127.0.0.1:8080/oauth2/auth/kakao?redirect_uri=http://localhost:3000/test

@@ -24,7 +24,7 @@ import org.springframework.util.StringUtils;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final OAuth2AuthenticationRepository oAuth2AuthenticationRepository;
-    private final UserRepository userRepository; // TODO 바운디드 컨텍스트를 위해 리팩토링 필요
+    private final UserRepository userRepository;
 
 
     @Transactional
@@ -53,9 +53,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             checkAlreadyRegisteredUserBy(email);
 
             // 신규 가입
-            User user = createUser(oAuth2UserInfo);
-
-            createOAuth2Authentication(oAuth2UserInfo, now, user);
+            User user = createUserAndOAuth2Authentication(oAuth2UserInfo, now);
 
             return CustomOAuth2UserDetails.create(user, oAuth2UserInfo.getAttributes());
         }
@@ -70,9 +68,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             oAuth2AuthenticationRepository.delete(oAuth2Authentication);
 
             // 신규 가입
-            User user = createUser(oAuth2UserInfo);
+            User user = createUserAndOAuth2Authentication(oAuth2UserInfo, now);
 
-            createOAuth2Authentication(oAuth2UserInfo, now, user);
             return CustomOAuth2UserDetails.create(user, oAuth2UserInfo.getAttributes());
         }
 
@@ -102,6 +99,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             //이미 가입한 회원이 존재함.
             throw new AlreadyRegisteredUserException(user.getEmail());
         });
+    }
+
+    private User createUserAndOAuth2Authentication(OAuth2UserInfo oAuth2UserInfo,
+            LocalDateTime now) {
+        User user = createUser(oAuth2UserInfo);
+        createOAuth2Authentication(oAuth2UserInfo, now, user);
+        return user;
     }
 
     private User createUser(OAuth2UserInfo oAuth2UserInfo) {

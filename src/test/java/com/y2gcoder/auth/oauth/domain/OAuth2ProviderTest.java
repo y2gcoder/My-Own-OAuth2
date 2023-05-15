@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-class OAuth2AuthenticationProviderTest {
+class OAuth2ProviderTest {
 
     @DisplayName("registrationId로 인증 프로바이더 타입을 불러올 수 있다.")
     @Test
@@ -31,7 +31,7 @@ class OAuth2AuthenticationProviderTest {
         OAuth2Provider result = OAuth2Provider.getByRegistrationId(registrationId);
 
         //then
-        assertThat(result).isNull();
+        assertThat(result).isEqualByComparingTo(OAuth2Provider.UNSUPPORTED);
 
     }
 }

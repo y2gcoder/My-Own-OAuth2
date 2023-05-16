@@ -54,14 +54,8 @@ public class OAuth2AuthController {
         ClientRegistration clientRegistration = getClientRegistration(
                 registrationId);
 
-        OAuth2AuthorizationRequest authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()
-                .authorizationUri(clientRegistration.getProviderDetails().getAuthorizationUri())
-                .clientId(clientRegistration.getClientId())
-                .scopes(clientRegistration.getScopes())
-                .redirectUri(redirectUri)
-                .build();
-
-        String authorizationRequestUri = authorizationRequest.getAuthorizationRequestUri();
+        String authorizationRequestUri = getAuthorizationRequestUri(redirectUri,
+                clientRegistration);
 
         Map<String, String> response = new HashMap<>();
         response.put("authorization_request_uri", authorizationRequestUri);
@@ -99,6 +93,18 @@ public class OAuth2AuthController {
             throw new UnsupportedOAuth2ProviderException(registrationId);
         }
         return clientRegistration;
+    }
+
+    private static String getAuthorizationRequestUri(String redirectUri,
+            ClientRegistration clientRegistration) {
+        OAuth2AuthorizationRequest authorizationRequest = OAuth2AuthorizationRequest.authorizationCode()
+                .authorizationUri(clientRegistration.getProviderDetails().getAuthorizationUri())
+                .clientId(clientRegistration.getClientId())
+                .scopes(clientRegistration.getScopes())
+                .redirectUri(redirectUri)
+                .build();
+
+        return authorizationRequest.getAuthorizationRequestUri();
     }
 
     private OAuth2AccessToken createOAuth2AccessToken(

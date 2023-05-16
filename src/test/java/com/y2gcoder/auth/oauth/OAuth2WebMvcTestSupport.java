@@ -1,6 +1,7 @@
 package com.y2gcoder.auth.oauth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.y2gcoder.auth.auth.application.CreateTokenService;
 import com.y2gcoder.auth.auth.infra.JwtTokenProvider;
 import com.y2gcoder.auth.common.infra.security.SecurityConfig;
 import com.y2gcoder.auth.oauth.ui.OAuth2AuthController;
@@ -45,6 +46,9 @@ public abstract class OAuth2WebMvcTestSupport {
 
     @MockBean
     private AuthenticationFailureHandler authenticationFailureHandler;
+
+    @MockBean
+    private CreateTokenService createTokenService;
 
 
 }

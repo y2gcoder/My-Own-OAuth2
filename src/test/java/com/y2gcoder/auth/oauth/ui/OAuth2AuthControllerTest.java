@@ -104,4 +104,5 @@ class OAuth2AuthControllerTest extends OAuth2WebMvcTestSupport {
 
     }
 
+
 }

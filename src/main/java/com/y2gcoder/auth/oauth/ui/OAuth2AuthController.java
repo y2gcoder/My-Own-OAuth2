@@ -44,7 +44,7 @@ public class OAuth2AuthController {
     private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
     private final CreateTokenService createTokenService;
 
-    @GetMapping("/oauth2/auth/{registrationId}")
+    @GetMapping("/oauth2/code/{registrationId}")
     public ResponseEntity<?> getAuthorizationRequestUri(
             @PathVariable String registrationId,
             @RequestParam("redirect_uri") String redirectUri) {

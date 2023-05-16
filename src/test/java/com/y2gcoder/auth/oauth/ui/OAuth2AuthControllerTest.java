@@ -42,7 +42,7 @@ class OAuth2AuthControllerTest extends OAuth2WebMvcTestSupport {
 
         // expected
         mockMvc.perform(
-                        get("/oauth2/auth/{registrationId}", registrationId)
+                        get("/oauth2/code/{registrationId}", registrationId)
                                 .queryParam("redirect_uri", redirectUri)
                 ).andDo(print())
                 .andExpect(status().isOk())
@@ -73,7 +73,7 @@ class OAuth2AuthControllerTest extends OAuth2WebMvcTestSupport {
 
         // expected
         mockMvc.perform(
-                        get("/oauth2/auth/{registrationId}", registrationId)
+                        get("/oauth2/code/{registrationId}", registrationId)
                                 .queryParam("redirect_uri", redirectUri)
                 ).andDo(print())
                 .andExpect(status().isOk())
@@ -91,7 +91,7 @@ class OAuth2AuthControllerTest extends OAuth2WebMvcTestSupport {
 
         // expected
         mockMvc.perform(
-                        get("/oauth2/auth/{registrationId}", registrationId)
+                        get("/oauth2/code/{registrationId}", registrationId)
                                 .queryParam("redirect_uri", redirectUri)
                 ).andDo(print())
                 .andExpect(status().isBadRequest())

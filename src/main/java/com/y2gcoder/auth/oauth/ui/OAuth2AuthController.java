@@ -6,6 +6,7 @@ import com.y2gcoder.auth.auth.application.RefreshTokenDto;
 import com.y2gcoder.auth.oauth.application.UnsupportedOAuth2ProviderException;
 import com.y2gcoder.auth.oauth.application.dto.CustomOAuth2UserDetails;
 import com.y2gcoder.auth.user.domain.UserId;
+import jakarta.validation.Valid;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -48,8 +49,6 @@ public class OAuth2AuthController {
     public ResponseEntity<?> getAuthorizationRequestUri(
             @PathVariable String registrationId,
             @RequestParam("redirect_uri") String redirectUri) {
-        log.info("registrationId: {}", registrationId);
-        log.info("redirect_uri: {}", redirectUri);
 
         ClientRegistration clientRegistration = getClientRegistration(
                 registrationId);
@@ -65,7 +64,7 @@ public class OAuth2AuthController {
     @PostMapping("/oauth2/token/{registrationId}")
     public ResponseEntity<OAuth2SignInResponse> handleAuthCodeExchange(
             @PathVariable("registrationId") String registrationId,
-            @RequestBody AuthCodeExchangeRequest authCodeExchangeRequest
+            @Valid @RequestBody AuthCodeExchangeRequest authCodeExchangeRequest
     ) {
         // 1. 인증 코드로 액세스 토큰 교환
         ClientRegistration clientRegistration = getClientRegistration(registrationId);

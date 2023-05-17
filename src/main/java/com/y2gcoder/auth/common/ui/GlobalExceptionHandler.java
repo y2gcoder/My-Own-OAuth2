@@ -8,10 +8,12 @@ import com.y2gcoder.auth.auth.application.RefreshTokenMismatchException;
 import com.y2gcoder.auth.auth.application.UnavailableAuthorizationCodeException;
 import com.y2gcoder.auth.auth.infra.InvalidPasswordException;
 import com.y2gcoder.auth.auth.infra.NotFoundOwnerException;
+import com.y2gcoder.auth.oauth.application.UnsupportedOAuth2ProviderException;
 import com.y2gcoder.auth.user.application.NotFoundUserException;
 import com.y2gcoder.auth.user.application.UserWithEmailExistsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -129,6 +131,29 @@ public class GlobalExceptionHandler {
                 .message(e.getMessage())
                 .build();
     }
+
+    /**
+     * OAuth2 인증
+     */
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(UnsupportedOAuth2ProviderException.class)
+    public ErrorResponse unsupportedOAuth2ProviderException(UnsupportedOAuth2ProviderException e) {
+        return ErrorResponse.builder()
+                .code(String.valueOf(HttpStatus.BAD_REQUEST.value()))
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(AuthenticationException.class)
+    public ErrorResponse authenticationException(
+            AuthenticationException e) {
+        return ErrorResponse.builder()
+                .code(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
+                .message(e.getMessage())
+                .build();
+    }
+
 
     /**
      * 공통

@@ -1,38 +1,66 @@
-# 직접 구현하는 Spring OAuth2 프로젝트
+# OAuth2 인증 플로우 변경을 위한 테스트 프로젝트
 
-## 개발 의도
+## 프로젝트 개발 의도
 
-- 회사에서 맡은 마이크로서비스 프로젝트 중 [SSO](https://ko.wikipedia.org/wiki/%ED%86%B5%ED%95%A9_%EC%9D%B8%EC%A6%9D) 기능의 통합인증 서비스를 개선해야 함
-- 회사의 기존 프로젝트는 Spring Security + Spring OAuth2 Client + JWT 조합
-- 회사의 프로젝트는 마이크로서비스로 나눠진 백엔드 프로젝트인데 위의 라이브러리 조합을 사용하니 비효율적인 면이 많음
-- OAuth2 라이브러리만 분리하고, 해당 부분을 직접 구현해보면 좋을 것 같음 
-- 이 부분을 검증해보기 위한 간단한 프로젝트
+- 회사의 [SSO](https://ko.wikipedia.org/wiki/%ED%86%B5%ED%95%A9_%EC%9D%B8%EC%A6%9D) 프로젝트를 출시하기 전에 인증
+  로직에 대해서 변경이 필요하다는 요구사항을 받음
+- 현재 SSO 서비스는 Spring Security, Spring OAuth2 Client, [JWT](https://jwt.io/) 를 사용하여 기본적인 ID/PW 로그인
+  외에도 [OAuth2](https://hudi.blog/oauth-2.0/) 인증을 제공하고
+  있음.
+- 현재 Spring OAuth2 Client의 기본적인 사용법에 따라 사용하고 있는 우리 SSO 서비스의 OAuth2 인증 플로우.
+
+  ![OAuth2-AS-IS drawio](https://github.com/y2gcoder/My-Own-OAuth2/assets/62074748/14aab179-70fa-4f70-bdea-b3b912a8a00d)
+
+
+- 원래 프로젝트 초기 요구사항은 OAuth2 인가 서버로 요청을 보내 인가 코드를 받아오는 것까지의 책임은 프론트엔드 쪽이었다고 함.
+- 위의 플로우대로 하면 2가지 측면에서 장점이 있을 것이라고 봄.
+    - UX
+        - OAuth2 인증 코드를 받고 난 후의 작업은 SSO 서버에 REST API 요청으로 보내 JSON으로 받기 때문에 리다이렉트가 일어날 필요가 없기 때문.
+    - 백엔드
+        - 백엔드에서도 OAuth2 인증 요청 URI로 통신하여 OAuth2 인가 서버로부터 인증 코드를 받아오는 책임을 프론트엔드와 분산할 수 있음.
+- 그래서 OAuth2 인증 플로우를 다음과 같이 변경해보기로 함.
+
+  ![OAuth2-TO-BE drawio](https://user-images.githubusercontent.com/62074748/233544640-8a4ff6f1-9bc3-46fb-a2ef-bf8b9f974a57.png)
+
+
+- 해당 인증 플로우가 가능한지 검증되지 않을 상태에서 바로 기존의 SSO 서비스에 적용하기에는 불필요한 시행착오를 많이 겪을 것이라고 생각함.
+- 그래서 간단한 프로젝트를 만들어 해당 인증 플로우가 가능한지 테스트해보기로 함.
 
 ## 요구사항
 
-- 인증(회원가입 & 로그인)
-  - ID/PW
-  - OAuth2(Google, Naver, Facebook, ...)
-  - 동일한 이메일을 기준으로 다른 방식으로 회원가입 || 로그인할 수 없다.
-  - 로그인했을 때 토큰(Access Token, Refresh Token)을 발급한다. 
-    - Access Token: 인증이 필요한 API 접근 시 필요
-    - Refresh Token: Access Token을 재발급한다.
-  - 로그아웃할 수 있다.
-- 회원
-  - 주요 속성: 이메일, 비밀번호, 이름
-  - 탈퇴한 회원을 다시 복구할 수 있다.
-  - 내 정보를 확인할 수 있다.
+- 사용자
+    - 이메일, 비밀번호, 이름, 프로필 이미지 정보를 갖고 있다.
+    - 완전 삭제를 하지 않고 Soft Delete한다.
+    - 가입한 내 정보를 조회할 수 있다.(인증 토큰 필요)
+- 인증 코드
+    - ID/PW로 회원가입한 사용자가 로그인하기 위해 필요한 일회용 인증코드다.
+    - 토큰 발급을 위해 사용한다.
+- 액세스 토큰
+    - 인증이 필요한 API에서 사용하기 위한 토큰이다.
+    - JWT를 사용하고, 백엔드에서 따로 저장하지는 않는다.
+- 리프레시 토큰
+    - 액세스 토큰을 재발급하기 위한 용도의 토큰이다.
+    - DB에 저장하고 토큰 재발급 시에 검증한다.
+- OAuth2 인증
+    - 기존 Spring OAuth2 Client의 기본적인 인증 플로우를 포함한다.
+    - Spring OAuth2 Client를 최대한 활용해서 작성할 수 있도록 해본다.
+    - OAuth2 인증 요청용 URI 발급: 프론트엔드에게 Redirect URI를 받아 OAuth2 인가 서버로 인증 코드를 요청할 수 있는 URI를 발급한다.
+    - OAuth2 인증 코드 처리: 프론트엔드로부터 받은 OAuth2 인가 코드에서 발급한 인증 코드로 OAuth2 인증 처리를 진행한다.
+        - OAuth2 인가 서버에서 사용하는 액세스 토큰 발급
+        - OAuth2 인증용 액세스 토큰으로 OAuth2 인가 서버로부터 사용자 정보 조회
+        - OAuth2 인가 서버에서 받아온 사용자 정보 처리(기존 OAuth2 인증 플로우에서 처리하던 것과 동일) 및 토큰 발급
+            - 이메일을 기준으로 처리
+            - 신규 회원: 회원가입 && 우리 서비스용 토큰 발급
+            - 기존 회원 && 해당 OAuth2 프로바이더로 가입했던 회원: 우리 서비스용 토큰 발급
+            - 기존 회원 && (다른 OAuth2 프로바이더로 가입 || ID/PW 가입): 예외 처리
 
-## 개발 조건
-- Spring Security 사용
-- 토큰 인증 방식
-  - Access Token: [JWT](https://jwt.io/)
-  - Refresh Token: DB 저장할 거라 아무거나
-- spring-boot-starter-oauth2-client 사용하지 않음.
-  - 여기서 구현해볼 흐름
-    ![OAuth2-TO-BE drawio](https://user-images.githubusercontent.com/62074748/233544640-8a4ff6f1-9bc3-46fb-a2ef-bf8b9f974a57.png)
-- [DDD](https://ko.wikipedia.org/wiki/%EB%8F%84%EB%A9%94%EC%9D%B8_%EC%A3%BC%EB%8F%84_%EC%84%A4%EA%B3%84)를 따라 최대한 구현해볼 것.
-- 테스트용 DB와 로컬 개발 환경용 DB를 분리 
-- Docker Compose를 사용해서 로컬 개발 환경 구축
+## 개발 순서
 
-## 개발 환경 구축 가이드(TODO)
+1. 인증 처리를 하지 않고 JWT만 이용해서 ID/PW 이용한 회원가입, 인증코드 발급, 토큰 발급, 토큰 재발급, 내 정보 조회 기능을 개발한다.
+2. Spring Security 추가하고 JWT 기반의 토큰 인증을 추가한다.
+3. Spring OAuth2 Client를 추가하여 토큰 기반으로 OAuth2 인증 플로우를 구성한다.(기존과 동일)
+4. TO-BE OAuth2 플로우에 따라 필요한 API 엔드포인트를 구현한다.
+    1. OAuth2 인증 코드 요청 URI 발급 API
+    2. OAuth2 인증 코드 처리 API
+
+

@@ -1,0 +1,23 @@
+### OAuth2 인증 요청용 URI 요청(Google)
+GET 127.0.0.1:8080/oauth2/code/google?redirect_uri=http://localhost:3000/test
+
+### OAuth2 인증 요청용 URI 요청(Kakao)
+GET 127.0.0.1:8080/oauth2/code/kakao?redirect_uri=http://localhost:3000/test
+
+### OAuth2 로그인 (Google)
+POST 127.0.0.1:8080/oauth2/token/google
+Content-Type: application/json
+
+{
+  "redirect_uri": "http://localhost:3000/test",
+  "code": "4%2F0AbUR2VN2J18wfs6e99QzjNppoB9P-5UJr6ghkoAVS5nA9gWX_jAWOZMSzKV1_sCUiJ1SnQ"
+}
+
+### OAuth2 로그인 (Kakao)
+POST 127.0.0.1:8080/oauth2/token/kakao
+Content-Type: application/json
+
+{
+  "redirect_uri": "http://localhost:3000/test",
+  "code": "Pz0TzOPa2e4djMOYtfA-LJFn-QOaaPawWgfqdWA-qvDwFzYoKOnbE1TnBTwNTwdLwbXsDworDR8AAAGIIfcrjQ"
+}

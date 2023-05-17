@@ -3,6 +3,7 @@ package com.y2gcoder.auth.user.application;
 import com.y2gcoder.auth.user.domain.User;
 import com.y2gcoder.auth.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SignUpService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public User signUp(String email, String password, String name, String profileImageUrl) {
         validatePassword(password);
@@ -19,12 +21,17 @@ public class SignUpService {
         checkIfUserExistsByEmail(email);
 
         UserId userId = userRepository.nextUserId();
+        String encryptedPassword = createEncryptedPassword(password);
         return userRepository.save(new User(userId,
                 email,
-                password,
+                encryptedPassword,
                 name,
                 null,
                 profileImageUrl));
+    }
+
+    private String createEncryptedPassword(String password) {
+        return passwordEncoder.encode(password);
     }
 
     private void validatePassword(String password) {

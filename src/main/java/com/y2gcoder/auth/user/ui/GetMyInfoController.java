@@ -17,7 +17,7 @@ public class GetMyInfoController {
     @GetMapping("/users/me")
     public ResponseEntity<MyInfoResponse> getMyInfo(@LoggedInUserId UserId userId) {
 
-        User user = userInfoService.findById(userId);
+        User user = userInfoService.getById(userId);
         return ResponseEntity.ok(new MyInfoResponse(user));
     }
 

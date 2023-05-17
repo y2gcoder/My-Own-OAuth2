@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 class IssueAuthorizationCodeServiceTest extends AuthIntegrationTestSupport {
 
@@ -28,6 +29,9 @@ class IssueAuthorizationCodeServiceTest extends AuthIntegrationTestSupport {
     private AuthorizationCodeProvider authorizationCodeProvider;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private IssueAuthorizationCodeService sut;
 
     @BeforeEach
@@ -35,7 +39,7 @@ class IssueAuthorizationCodeServiceTest extends AuthIntegrationTestSupport {
         userJpaRepository.save(new UserJpaEntity(
                 "userId",
                 "test@test.com",
-                "test1234",
+                passwordEncoder.encode("test1234"),
                 "name",
                 null,
                 null

@@ -126,7 +126,7 @@ class TokenRefreshControllerTest extends AuthWebMvcTestSupport {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("401"))
                 .andExpect(jsonPath("$.message")
-                        .value("유효하지 않은 액세스 토큰입니다."));
+                        .value("Authentication required. Please provide a valid token."));
     }
 
     @DisplayName("저장된 리프레시 토큰이 있어야 토큰을 재발급할 수 있다.")
@@ -197,8 +197,6 @@ class TokenRefreshControllerTest extends AuthWebMvcTestSupport {
                 .andExpect(jsonPath("$.message")
                         .value("리프레시 토큰이 만료되었습니다."));
     }
-
-
 
 
 }

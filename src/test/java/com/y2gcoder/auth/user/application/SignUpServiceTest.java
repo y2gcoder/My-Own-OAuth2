@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 class SignUpServiceTest extends UserIntegrationTestSupport {
 
@@ -20,6 +21,9 @@ class SignUpServiceTest extends UserIntegrationTestSupport {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private SignUpService sut;
@@ -44,8 +48,9 @@ class SignUpServiceTest extends UserIntegrationTestSupport {
         // then
         assertThat(result.getId()).isNotNull();
         assertThat(result).isNotNull()
-                .extracting("email", "password", "name", "deletedAt")
-                .contains(email, password, name, null);
+                .extracting("email", "name", "deletedAt")
+                .contains(email, name, null);
+        assertThat(passwordEncoder.matches(password, result.getPassword())).isTrue();
     }
 
     @DisplayName("유저를 생성할 때 비밀번호는 8자리 이상이어야 한다.")

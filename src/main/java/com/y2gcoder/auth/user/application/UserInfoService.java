@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserInfoService {
     private final UserRepository userRepository;
 
-    public User findById(UserId userId) {
+    public User getById(UserId userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundUserException(userId));
     }
